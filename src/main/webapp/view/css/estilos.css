@@ -273,6 +273,8 @@ textarea,
     position: relative;
     border: none !important;
     box-shadow: var(--sombra-hover);
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .modal-contenido form > .btn-azul {
