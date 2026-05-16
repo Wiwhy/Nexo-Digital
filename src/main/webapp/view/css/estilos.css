@@ -119,6 +119,7 @@ textarea,
 .tarjeta-noticia {
     display: flex;
     flex-direction: column;
+    height: 100%;
     width: 100%;
     background: var(--bg-blanco);
     border-radius: var(--radio-tarjetas) !important;
@@ -141,9 +142,16 @@ textarea,
 }
 
 .contenido-tarjeta {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
     padding: 1.5rem;
     width: 100%;
     box-sizing: border-box;
+}
+
+.btn-accion-tarjeta {
+    margin-top: auto;
 }
 
 .contenido-tarjeta h3 {
