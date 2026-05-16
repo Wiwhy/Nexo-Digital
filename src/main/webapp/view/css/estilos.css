@@ -108,21 +108,24 @@ textarea,
     flex: 1;
 }
 
-/* --- INICIO ZONA GRID Y TARJETAS FLEXIBLES --- */
+/* --- INICIO DISEÑO PINTEREST PURO --- */
 .grid-noticias {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2.5rem;
+    column-count: 3;
+    column-gap: 2.5rem;
     width: 100%;
+    display: block !important;
     margin-top: 0 !important;
 }
 
 .tarjeta-noticia {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    /* Obliga a la tarjeta a rellenar la altura de la fila */
+    display: inline-block;
     width: 100%;
+    height: auto !important;
+    /* Se adapta a su contenido */
+    margin-bottom: 2.5rem;
+    /* Separación hacia abajo */
+    break-inside: avoid;
+    /* Evita que se corte a la mitad */
     background: var(--bg-blanco);
     border-radius: var(--radio-tarjetas) !important;
     overflow: hidden;
@@ -141,13 +144,10 @@ textarea,
     height: 14rem;
     object-fit: cover;
     background: var(--bg-fondo);
+    display: block;
 }
 
 .contenido-tarjeta {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    /* Ocupa el espacio sobrante de la tarjeta estirada */
     padding: 1.5rem;
     width: 100%;
     box-sizing: border-box;
@@ -162,7 +162,7 @@ textarea,
     white-space: normal;
 }
 
-/* --- FIN ZONA GRID Y TARJETAS FLEXIBLES --- */
+/* --- FIN DISEÑO PINTEREST PURO --- */
 
 .noticia-completa {
     background: var(--bg-blanco);
@@ -373,7 +373,8 @@ textarea,
 
 @media (max-width: 48rem) {
     .grid-noticias {
-        grid-template-columns: 1fr;
+        column-count: 1;
+        /* ¡CLAVE! En móviles se ve en 1 sola columna */
     }
 
     .noticia-completa {
@@ -390,7 +391,6 @@ input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
     -webkit-box-shadow: 0 0 0 2rem var(--bg-fondo) inset !important;
-    /* Arreglado, sin px */
     -webkit-text-fill-color: var(--texto-principal) !important;
     transition: background-color 5000s ease-in-out 0s;
 }
