@@ -1,1 +1,2 @@
-<% response.sendRedirect("/view/index.html"); %>
+<%@ page contentType="text/html; charset=UTF-8" %>
+<jsp:forward page="/view/index.html" />
