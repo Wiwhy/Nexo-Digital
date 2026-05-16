@@ -1,1 +1,1 @@
-<% response.sendRedirect("view/index.html"); %>
+<% response.sendRedirect("/view/index.html"); %>
