@@ -73,10 +73,10 @@ async function cargarNoticias() {
 
             // OPERADOR TERNARIO (? :): Es un if/else en una sola línea.
             // Pregunta: ¿n.nombreImagen existe Y no es el texto 'null' Y no está vacía?
-            // Si la respuesta es SÍ (?): La ruta será la URL de S3.
+            // Si la respuesta es SÍ (?): La ruta será la carpeta de subidas de tu servidor.
             // Si la respuesta es NO (:): Le ponemos una imagen gris de internet (placeholder) para que no se rompa el diseño.
             const imgSrc = (n.nombreImagen && n.nombreImagen !== 'null' && n.nombreImagen !== '')
-                ? `../api/noticias/imagen/${n.nombreImagen}`
+                ? `../uploads/${n.nombreImagen}`
                 : 'https://placehold.co/600x400/1a1a2e/e0e0e0?text=Nexo+Digital';
 
             // Usamos Template Literals (las comillas invertidas ``). Nos permiten escribir HTML
