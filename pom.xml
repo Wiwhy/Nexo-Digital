@@ -37,7 +37,7 @@
     </dependencies>
 
     <build>
-        <finalName>gestion-noticias</finalName>
+        <finalName>ROOT</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
