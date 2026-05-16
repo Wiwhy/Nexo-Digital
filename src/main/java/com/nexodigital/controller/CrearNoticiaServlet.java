@@ -55,10 +55,22 @@ public class CrearNoticiaServlet extends HttpServlet {
                 String extension = nombreOriginal.substring(nombreOriginal.lastIndexOf("."));
                 nombreImagenFinal = UUID.randomUUID().toString() + extension;
 
-                String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads";
+                String uploadPath = "/datos_persistentes";
                 File uploadDir = new File(uploadPath);
-                if (!uploadDir.exists())
-                    uploadDir.mkdir();
+
+                if (!uploadDir.exists()) {
+                    try {
+                        uploadDir.mkdirs();
+                    } catch (SecurityException ignored) {}
+                }
+
+                if (!uploadDir.exists() || !uploadDir.canWrite()) {
+                    uploadPath = getServletContext().getRealPath("") + File.separator + "uploads";
+                    uploadDir = new File(uploadPath);
+                    if (!uploadDir.exists()) {
+                        uploadDir.mkdirs();
+                    }
+                }
 
                 filePart.write(uploadPath + File.separator + nombreImagenFinal);
             }
