@@ -38,7 +38,7 @@ async function cargarNoticiaIndividual() {
 
         const imgElement = document.getElementById('noticia-imagen');
         if (n.nombreImagen && n.nombreImagen !== 'null' && n.nombreImagen !== '') {
-            imgElement.src = `../uploads/${n.nombreImagen}`;
+            imgElement.src = `../api/noticias/imagen/${n.nombreImagen}`;
             imgElement.style.display = 'block';
         } else {
             imgElement.style.display = 'none';
