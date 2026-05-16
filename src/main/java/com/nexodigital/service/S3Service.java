@@ -7,12 +7,17 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.time.Duration;
 
 public class S3Service {
     private static S3Client s3Client;
+    private static S3Presigner presigner;
     private static String bucketName;
     private static String endpoint;
 
@@ -41,6 +46,15 @@ public class S3Service {
                         .pathStyleAccessEnabled(true)
                         .build())
                 .build();
+
+        presigner = S3Presigner.builder()
+                .region(Region.of(region))
+                .credentialsProvider(StaticCredentialsProvider.create(credentials))
+                .endpointOverride(URI.create(endpoint))
+                .serviceConfiguration(S3Configuration.builder()
+                        .pathStyleAccessEnabled(true)
+                        .build())
+                .build();
     }
 
     public static void uploadImage(String fileName, InputStream fileContent, long contentLength) throws Exception {
@@ -58,12 +72,26 @@ public class S3Service {
     }
 
     public static String getImageUrl(String fileName) {
-        return endpoint + "/" + bucketName + "/" + fileName;
+        try {
+            GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                    .signatureDuration(Duration.ofHours(24))
+                    .getObjectRequest(b -> b.bucket(bucketName).key(fileName))
+                    .build();
+
+            PresignedGetObjectRequest presignedRequest = presigner.presignGetObject(presignRequest);
+            return presignedRequest.url().toString();
+        } catch (Exception e) {
+            // Fallback a URL directa si falla la generación de presigned URL
+            return endpoint + "/" + bucketName + "/" + fileName;
+        }
     }
 
     public static void closeClient() {
         if (s3Client != null) {
             s3Client.close();
+        }
+        if (presigner != null) {
+            presigner.close();
         }
     }
 }
