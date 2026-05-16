@@ -108,24 +108,22 @@ textarea,
     flex: 1;
 }
 
-/* --- INICIO DISEÑO PINTEREST PURO --- */
+/* --- INICIO ZONA GRID HORIZONTAL (OPCIÓN B) --- */
 .grid-noticias {
-    column-count: 3;
-    column-gap: 2.5rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    /* 3 columnas de izquierda a derecha */
+    gap: 2.5rem;
     width: 100%;
-    display: block !important;
     margin-top: 0 !important;
 }
 
 .tarjeta-noticia {
-    display: inline-block;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    /* Obliga a la tarjeta a medir lo mismo que la más alta de su fila */
     width: 100%;
-    height: auto !important;
-    /* Se adapta a su contenido */
-    margin-bottom: 2.5rem;
-    /* Separación hacia abajo */
-    break-inside: avoid;
-    /* Evita que se corte a la mitad */
     background: var(--bg-blanco);
     border-radius: var(--radio-tarjetas) !important;
     overflow: hidden;
@@ -148,6 +146,10 @@ textarea,
 }
 
 .contenido-tarjeta {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    /* Rellena el espacio interno restante con fondo blanco */
     padding: 1.5rem;
     width: 100%;
     box-sizing: border-box;
@@ -162,7 +164,7 @@ textarea,
     white-space: normal;
 }
 
-/* --- FIN DISEÑO PINTEREST PURO --- */
+/* --- FIN ZONA GRID HORIZONTAL --- */
 
 .noticia-completa {
     background: var(--bg-blanco);
@@ -349,7 +351,6 @@ textarea,
     border: 1px solid var(--lineas-disabled);
     padding: 0.5rem 1rem;
     border-radius: 0.25rem;
-    /* Sin px */
     color: var(--texto-principal);
     cursor: pointer;
     margin-right: 1rem;
@@ -373,8 +374,7 @@ textarea,
 
 @media (max-width: 48rem) {
     .grid-noticias {
-        column-count: 1;
-        /* ¡CLAVE! En móviles se ve en 1 sola columna */
+        grid-template-columns: 1fr;
     }
 
     .noticia-completa {
