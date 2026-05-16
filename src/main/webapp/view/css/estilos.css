@@ -109,25 +109,23 @@ textarea,
 }
 
 .grid-noticias {
-    display: block;
-    column-count: 3;
-    column-gap: 2.5rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2.5rem;
     width: 100%;
     margin-top: 0 !important;
 }
 
 .tarjeta-noticia {
-    display: inline-block;
+    display: flex;
+    flex-direction: column;
     width: 100%;
-    margin-bottom: 2.5rem;
     background: var(--bg-blanco);
     border-radius: var(--radio-tarjetas) !important;
     overflow: hidden;
     cursor: pointer;
     border: none !important;
     transition: transform 0.2s, box-shadow 0.2s;
-    break-inside: avoid;
-    vertical-align: top;
 }
 
 .tarjeta-noticia:hover {
@@ -363,7 +361,7 @@ textarea,
 
 @media (max-width: 48rem) {
     .grid-noticias {
-        column-count: 1;
+        grid-template-columns: 1fr;
     }
 
     .noticia-completa {
