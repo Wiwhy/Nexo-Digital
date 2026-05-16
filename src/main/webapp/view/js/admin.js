@@ -74,6 +74,13 @@ function abrirModalNoticia(noticia = null) {
         document.getElementById('noticia-titulo-input').value = noticia.titulo;
         document.getElementById('noticia-autor-input').value = noticia.autor || '';
         document.getElementById('noticia-contenido').value = noticia.contenido;
+        
+        const spanImagen = document.getElementById('nombre-imagen-actual');
+        if (noticia.nombreImagen && noticia.nombreImagen !== 'null' && noticia.nombreImagen !== '') {
+            spanImagen.textContent = 'Imagen actual: ' + noticia.nombreImagen;
+        } else {
+            spanImagen.textContent = 'Sin imagen actual';
+        }
 
         btnGuardar.textContent = 'Guardar';
         btnEliminar.style.display = 'block';
@@ -81,6 +88,7 @@ function abrirModalNoticia(noticia = null) {
     } else {
         document.getElementById('modal-noticia-titulo').textContent = 'Crear noticia';
         document.getElementById('noticia-id').value = '';
+        document.getElementById('nombre-imagen-actual').textContent = '';
         btnGuardar.textContent = 'Crear';
         btnEliminar.style.display = 'none';
     }
