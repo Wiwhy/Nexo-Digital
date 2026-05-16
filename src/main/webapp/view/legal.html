@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aviso Legal y Privacidad - Nexo Digital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/estilos.css?">
+</head>
+
+<body>
+
+    <header class="cabecera-principal">
+        <div class="contenedor-header">
+            <a href="index.html" class="logo-link">
+                <h1>Nexo Digital</h1>
+            </a>
+        </div>
+    </header>
+
+    <main class="contenedor-principal">
+        <article class="noticia-completa">
+
+            <h2 style="color: var(--color-primario); margin-bottom: 1.5rem;">Política de Privacidad</h2>
+            <div class="cuerpo-texto">
+                <p>En Nexo Digital, la privacidad y la seguridad de nuestros lectores son un pilar fundamental. Le
+                    informamos de que este sitio web está diseñado para ofrecer una navegación completamente anónima,
+                    por lo que no se recopila, almacena ni procesa ningún tipo de dato de carácter personal de los
+                    usuarios públicos.</p>
+                <p>Nuestra plataforma no requiere de registros de usuario para la lectura de contenidos, no emplea
+                    sistemas de suscripción mediante correo electrónico ni utiliza herramientas de seguimiento
+                    destinadas al perfilado comercial de los visitantes. El uso de credenciales de autenticación está
+                    estrictamente limitado a las áreas de acceso restringido destinadas al personal técnico y de edición
+                    autorizado para el mantenimiento de la plataforma.</p>
+                <p>Al no existir bases de datos de carácter público ni almacenamiento de información confidencial de
+                    terceros, garantizamos un entorno digital seguro y el cumplimiento riguroso de los principios de
+                    minimización de datos y privacidad desde el diseño.</p>
+            </div>
+
+            <h2 style="color: var(--color-primario); margin-top: 3.5rem; margin-bottom: 1.5rem;">Aviso Legal</h2>
+            <div class="cuerpo-texto">
+                <p>El presente documento regula el uso de la plataforma informativa Nexo Digital. El acceso y la
+                    navegación por este sitio web atribuyen la condición de usuario e implican la aceptación plena de
+                    todas las disposiciones incluidas en este texto.</p>
+                <p>Todos los contenidos publicados, incluyendo textos, maquetación gráfica, logotipos e imágenes, están
+                    protegidos por las normativas de propiedad intelectual. Queda expresamente prohibida la reproducción
+                    total o parcial de los mismos con fines comerciales sin la autorización previa por escrito de los
+                    titulares de la plataforma.</p>
+                <p>Nexo Digital no se hace responsable de las opiniones vertidas por los colaboradores en sus artículos,
+                    ni de los daños informáticos que puedan derivarse de causas ajenas a nuestro control técnico.
+                    Asimismo, la presencia de enlaces externos tiene una función meramente informativa, no asumiendo
+                    esta dirección responsabilidad alguna sobre los contenidos o servicios de los sitios enlazados.</p>
+            </div>
+
+        </article>
+    </main>
+
+    <footer class="pie-pagina">
+        <div class="contenedor-footer">
+            <a href="legal.html" class="btn-texto-azul">Política de privacidad y aviso legal</a>
+            <div id="controles-publicos">
+                <button id="btn-abrir-login" class="btn-texto-azul">Admin</button>
+            </div>
+            <div id="controles-admin" style="display:none;">
+                <a href="admin.html" class="btn-texto-azul">Panel de admin</a>
+            </div>
+        </div>
+    </footer>
+
+    <div id="modal-login" class="modal" style="display:none;">
+        <div class="modal-contenido">
+            <span class="cerrar" id="btn-cerrar-login">&times;</span>
+            <h2>Acceso administrador</h2>
+            <form id="form-login">
+                <div class="grupo-input">
+                    <label for="usuario">Usuario:</label>
+                    <input type="text" id="usuario" name="usuario" required>
+                </div>
+                <div class="grupo-input">
+                    <label for="password">Contraseña:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="btn-azul btn-grande">Entrar</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/noticia.js"></script>
+</body>
+
+</html>

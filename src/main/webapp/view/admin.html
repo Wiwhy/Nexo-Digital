@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Nexo Digital</title>
+    <link rel="stylesheet" href="css/estilos.css?v=9">
+    <link rel="stylesheet" href="css/admin.css?v=9">
+</head>
+
+<body>
+
+    <header class="cabecera-principal">
+        <div class="contenedor-header">
+            <a href="index.html" class="logo-link">
+                <h1>Nexo Digital ⚙️</h1>
+            </a>
+        </div>
+    </header>
+
+    <main class="contenedor-principal">
+        <div class="tarjeta-admin">
+            <div class="encabezado-admin">
+                <h2>Gestión de noticias</h2>
+                <button class="btn-azul btn-pequeno" id="btn-nueva-noticia">Crear</button>
+            </div>
+
+            <div id="lista-noticias" class="lista-admin">
+            </div>
+        </div>
+    </main>
+
+    <footer class="pie-pagina">
+        <div class="contenedor-footer">
+            <a href="legal.html" class="btn-texto-azul">Política de Privacidad y Aviso Legal</a>
+            <a href="#" id="btn-logout" class="btn-texto-azul">Cerrar Sesión</a>
+        </div>
+    </footer>
+
+    <div id="modal-noticia" class="modal" style="display:none;">
+        <div class="modal-contenido">
+            <span class="cerrar" id="btn-cerrar-modal-noticia">&times;</span>
+            <h2 id="modal-noticia-titulo">Editar noticia</h2>
+
+            <form id="form-noticia" enctype="multipart/form-data">
+                <input type="hidden" name="id" id="noticia-id">
+
+                <div class="grupo-input">
+                    <label>Título:</label>
+                    <input type="text" id="noticia-titulo-input" name="titulo" required>
+                </div>
+
+                <div class="grupo-input">
+                    <label>Autor:</label>
+                    <input type="text" id="noticia-autor-input" name="autor" required>
+                </div>
+
+                <div class="grupo-input">
+                    <label>Contenido:</label>
+                    <textarea id="noticia-contenido" name="contenido" required></textarea>
+                </div>
+
+                <div class="grupo-input">
+                    <label>Imagen:</label>
+                    <input type="file" id="noticia-imagen" name="imagen" accept="image/*">
+                </div>
+
+                <div class="acciones-modal-flex">
+                    <button type="submit" class="btn-azul btn-grande" id="btn-guardar-modal">Guardar</button>
+                    <button type="button" class="btn-azul btn-grande" id="btn-eliminar-modal">Eliminar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/admin.js"></script>
+</body>
+
+</html>

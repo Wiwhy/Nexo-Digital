@@ -1,0 +1,106 @@
+.tarjeta-admin {
+    background: var(--bg-blanco);
+    border-radius: 15px !important;
+    padding: 3rem;
+    border: none !important;
+    box-shadow: var(--sombra-fija);
+    width: 100%;
+}
+
+.encabezado-admin {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 1.2rem !important;
+    margin-bottom: 0 !important;
+    border-bottom: 1px solid var(--lineas-disabled);
+}
+
+.encabezado-admin h2 {
+    font-size: 2rem;
+    margin: 0 !important;
+    line-height: 1 !important;
+}
+
+.lista-admin {
+    display: flex;
+    flex-direction: column;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.fila-noticia {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.2rem 0 !important;
+    margin: 0 !important;
+    border-bottom: 1px solid var(--lineas-disabled);
+}
+
+.fila-noticia:last-child {
+    border-bottom: none;
+}
+
+.titulo-noticia-lista {
+    flex: 1;
+    min-width: 0; /* This is the magic property that lets flex items shrink below their content size */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0 !important;
+    display: block;
+}
+
+.fila-noticia button {
+    flex-shrink: 0 !important;
+    margin: 0 !important;
+}
+
+textarea {
+    resize: none;
+    width: 100%;
+    min-height: 14rem;
+}
+
+.acciones-modal-flex {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 2rem;
+    justify-content: center;
+}
+
+.acciones-modal-flex button {
+    background-color: var(--color-primario) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: var(--radio-botones) !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    cursor: pointer;
+    width: 7.5rem !important;
+    height: 2.8rem !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    flex: none !important;
+    max-width: none !important;
+}
+
+.acciones-modal-flex button:hover {
+    background-color: var(--color-hover) !important;
+}
+
+@media (max-width: 48rem) {
+    .tarjeta-admin {
+        padding: 1.5rem;
+    }
+
+    .encabezado-admin h2 {
+        font-size: 1.5rem;
+    }
+
+    .fila-noticia {
+        gap: 1rem;
+    }
+}
