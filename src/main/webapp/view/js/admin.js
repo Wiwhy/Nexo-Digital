@@ -75,11 +75,11 @@ function abrirModalNoticia(noticia = null) {
         document.getElementById('noticia-autor-input').value = noticia.autor || '';
         document.getElementById('noticia-contenido').value = noticia.contenido;
         
-        const spanImagen = document.getElementById('nombre-imagen-actual');
+        const fileText = document.getElementById('file-input-text');
         if (noticia.nombreImagen && noticia.nombreImagen !== 'null' && noticia.nombreImagen !== '') {
-            spanImagen.textContent = 'Imagen actual: ' + noticia.nombreImagen;
+            fileText.textContent = noticia.nombreImagen;
         } else {
-            spanImagen.textContent = 'Sin imagen actual';
+            fileText.textContent = 'Ningún archivo seleccionado';
         }
 
         btnGuardar.textContent = 'Guardar';
@@ -88,7 +88,7 @@ function abrirModalNoticia(noticia = null) {
     } else {
         document.getElementById('modal-noticia-titulo').textContent = 'Crear noticia';
         document.getElementById('noticia-id').value = '';
-        document.getElementById('nombre-imagen-actual').textContent = '';
+        document.getElementById('file-input-text').textContent = 'Ningún archivo seleccionado';
         btnGuardar.textContent = 'Crear';
         btnEliminar.style.display = 'none';
     }
@@ -148,4 +148,15 @@ document.addEventListener('visibilitychange', () => {
 
 window.addEventListener('pageshow', () => {
     window.dispatchEvent(new Event('resize'));
+});
+
+document.getElementById('noticia-imagen').addEventListener('change', function() {
+    const fileText = document.getElementById('file-input-text');
+    if (this.files && this.files.length > 0) {
+        fileText.textContent = this.files[0].name;
+    } else {
+        // If they cancel selection, we should keep the existing name if editing?
+        // Let's just say "Ningún archivo seleccionado" or revert.
+        fileText.textContent = 'Ningún archivo seleccionado';
+    }
 });
