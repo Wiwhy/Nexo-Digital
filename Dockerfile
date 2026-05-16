@@ -12,5 +12,8 @@ RUN rm -rf /usr/local/tomcat/webapps/*
 # Copiamos la aplicación correcta
 COPY --from=builder /app/target/gestion-noticias.war /usr/local/tomcat/webapps/ROOT.war
 
+# Crear la carpeta de datos persistentes para que Tomcat no falle si no se ha montado el volumen
+RUN mkdir -p /datos_persistentes && chmod 777 /datos_persistentes
+
 EXPOSE 8080
 CMD ["catalina.sh", "run"]
