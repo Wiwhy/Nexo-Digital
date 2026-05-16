@@ -2,7 +2,6 @@ package com.nexodigital.controller;
 
 import com.nexodigital.model.NoticiaDAO;
 import com.nexodigital.model.Noticia;
-import com.nexodigital.service.S3Service;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -12,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.UUID;
@@ -55,8 +55,12 @@ public class CrearNoticiaServlet extends HttpServlet {
                 String extension = nombreOriginal.substring(nombreOriginal.lastIndexOf("."));
                 nombreImagenFinal = UUID.randomUUID().toString() + extension;
 
-                // Upload to S3
-                S3Service.uploadImage(nombreImagenFinal, filePart.getInputStream(), filePart.getSize());
+                String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads";
+                File uploadDir = new File(uploadPath);
+                if (!uploadDir.exists())
+                    uploadDir.mkdir();
+
+                filePart.write(uploadPath + File.separator + nombreImagenFinal);
             }
 
             Noticia nuevaNoticia = new Noticia(titulo, contenido, nombreImagenFinal, autor);
