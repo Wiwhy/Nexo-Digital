@@ -108,21 +108,19 @@ textarea,
     flex: 1;
 }
 
-/* --- INICIO ZONA GRID HORIZONTAL (OPCIÓN B) --- */
+/* --- INICIO ZONA GRID HORIZONTAL ADAPTABLE --- */
 .grid-noticias {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    /* 3 columnas de izquierda a derecha */
     gap: 2.5rem;
     width: 100%;
     margin-top: 0 !important;
+    align-items: start;
 }
 
 .tarjeta-noticia {
     display: flex;
     flex-direction: column;
-    height: 100%;
-    /* Obliga a la tarjeta a medir lo mismo que la más alta de su fila */
     width: 100%;
     background: var(--bg-blanco);
     border-radius: var(--radio-tarjetas) !important;
@@ -148,8 +146,6 @@ textarea,
 .contenido-tarjeta {
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
-    /* Rellena el espacio interno restante con fondo blanco */
     padding: 1.5rem;
     width: 100%;
     box-sizing: border-box;
@@ -164,7 +160,7 @@ textarea,
     white-space: normal;
 }
 
-/* --- FIN ZONA GRID HORIZONTAL --- */
+/* --- FIN ZONA GRID HORIZONTAL ADAPTABLE --- */
 
 .noticia-completa {
     background: var(--bg-blanco);
