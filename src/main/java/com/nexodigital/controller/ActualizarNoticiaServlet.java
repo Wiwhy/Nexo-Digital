@@ -1,6 +1,6 @@
 package com.nexodigital.controller;
 
-import com.nexodigital.model.NoticiaDAO;
+import com.nexodigital.model.ActualizarNoticiaDAO;
 import com.nexodigital.model.Noticia;
 
 import jakarta.servlet.ServletException;
@@ -78,8 +78,8 @@ public class ActualizarNoticiaServlet extends HttpServlet {
             Noticia noticia = new Noticia(titulo, contenido, nombreImagenFinal, autor);
             noticia.setId(id);
 
-            NoticiaDAO dao = new NoticiaDAO();
-            if (dao.actualizarNoticia(noticia)) {
+            ActualizarNoticiaDAO dao = new ActualizarNoticiaDAO();
+            if (dao.actualizar(noticia)) {
                 out.print("{\"status\":\"success\", \"message\":\"Noticia actualizada correctamente\"}");
             } else {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

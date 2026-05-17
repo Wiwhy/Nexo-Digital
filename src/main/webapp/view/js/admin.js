@@ -43,7 +43,9 @@ async function cargarNoticiasAdmin() {
         const res = await fetch('../api/noticias/listar');
         noticiasGlobales = await res.json();
         renderTablaNoticias();
-    } catch (err) { }
+    } catch (err) {
+        console.error('Error al cargar noticias:', err);
+    }
 }
 
 function renderTablaNoticias() {
@@ -114,7 +116,9 @@ async function guardarNoticia(e) {
             const data = await res.json().catch(() => ({}));
             alert('Error: ' + (data.message || res.status));
         }
-    } catch (err) { }
+    } catch (err) {
+        console.error('Error al guardar noticia:', err);
+    }
 }
 
 async function eliminarNoticia(id) {
@@ -131,7 +135,9 @@ async function eliminarNoticia(id) {
         } else {
             alert('Error al eliminar noticia');
         }
-    } catch (err) { }
+    } catch (err) {
+        console.error('Error al eliminar noticia:', err);
+    }
 }
 
 function abrirModal(id) { document.getElementById(id).style.display = 'flex'; }

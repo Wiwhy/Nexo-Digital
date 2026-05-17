@@ -2,7 +2,7 @@ package com.nexodigital.controller;
 
 import com.google.gson.Gson;
 import com.nexodigital.model.Noticia;
-import com.nexodigital.model.NoticiaDAO;
+import com.nexodigital.model.ObtenerNoticiaDAO;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -39,7 +39,7 @@ public class ObtenerNoticiaServlet extends HttpServlet {
 
         try {
             int id = Integer.parseInt(idParam);
-            NoticiaDAO dao = new NoticiaDAO();
+            ObtenerNoticiaDAO dao = new ObtenerNoticiaDAO();
             Noticia noticia = dao.obtenerPorId(id);
 
             if (noticia != null) {

@@ -1,6 +1,6 @@
 .tarjeta-admin {
     background: var(--bg-blanco);
-    border-radius: 15px !important;
+    border-radius: 1rem !important;
     padding: 3rem;
     border: none !important;
     box-shadow: var(--sombra-fija);
@@ -13,7 +13,7 @@
     align-items: center;
     padding-bottom: 1.2rem !important;
     margin-bottom: 0 !important;
-    border-bottom: 1px solid var(--lineas-disabled);
+    border-bottom: 0.0625rem solid var(--lineas-disabled);
 }
 
 .encabezado-admin h2 {
@@ -36,7 +36,7 @@
     gap: 1.5rem;
     padding: 1.2rem 0 !important;
     margin: 0 !important;
-    border-bottom: 1px solid var(--lineas-disabled);
+    border-bottom: 0.0625rem solid var(--lineas-disabled);
 }
 
 .fila-noticia:last-child {
@@ -104,4 +104,54 @@ textarea {
     .fila-noticia {
         gap: 1rem;
     }
+}
+
+.file-input-wrapper {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    padding: 1rem;
+    border-radius: var(--radio-botones);
+    background-color: var(--bg-fondo);
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.file-input-btn {
+    background-color: var(--bg-blanco);
+    border: 0.0625rem solid var(--lineas-disabled);
+    border-radius: 0.25rem;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    font-family: inherit;
+    font-weight: 600;
+    pointer-events: none;
+    color: var(--texto-principal);
+    margin-right: 1rem;
+    transition: background-color 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.file-input-text {
+    font-size: 1rem;
+    font-family: inherit;
+    color: var(--texto-principal);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 11.25rem);
+}
+
+.file-input-real {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
 }

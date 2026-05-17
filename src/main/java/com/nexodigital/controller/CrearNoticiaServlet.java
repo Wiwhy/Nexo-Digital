@@ -1,6 +1,6 @@
 package com.nexodigital.controller;
 
-import com.nexodigital.model.NoticiaDAO;
+import com.nexodigital.model.CrearNoticiaDAO;
 import com.nexodigital.model.Noticia;
 
 import jakarta.servlet.ServletException;
@@ -76,8 +76,8 @@ public class CrearNoticiaServlet extends HttpServlet {
             }
 
             Noticia nuevaNoticia = new Noticia(titulo, contenido, nombreImagenFinal, autor);
-            NoticiaDAO noticiaDAO = new NoticiaDAO();
-            boolean guardadoExitoso = noticiaDAO.crearNoticia(nuevaNoticia);
+            CrearNoticiaDAO dao = new CrearNoticiaDAO();
+            boolean guardadoExitoso = dao.crear(nuevaNoticia);
 
             if (guardadoExitoso) {
                 out.print("{\"status\":\"success\", \"message\":\"Noticia publicada correctamente\"}");

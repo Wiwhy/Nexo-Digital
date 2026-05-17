@@ -1,6 +1,6 @@
 package com.nexodigital.controller;
 
-import com.nexodigital.model.NoticiaDAO;
+import com.nexodigital.model.EliminarNoticiaDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -29,9 +29,9 @@ public class EliminarNoticiaServlet extends HttpServlet {
 
         try {
             int id = Integer.parseInt(request.getParameter("id"));
-            NoticiaDAO dao = new NoticiaDAO();
+            EliminarNoticiaDAO dao = new EliminarNoticiaDAO();
 
-            if (dao.eliminarNoticia(id)) {
+            if (dao.eliminar(id)) {
                 out.print("{\"status\":\"success\", \"message\":\"Noticia eliminada correctamente\"}");
             } else {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

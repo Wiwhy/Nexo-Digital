@@ -1,6 +1,6 @@
 package com.nexodigital.controller;
 
-import com.nexodigital.model.NoticiaDAO;
+import com.nexodigital.model.ListarNoticiasDAO;
 import com.nexodigital.model.Noticia;
 
 import jakarta.servlet.ServletException;
@@ -24,8 +24,8 @@ public class ListarNoticiasServlet extends HttpServlet {
         response.setCharacterEncoding("UTF-8");
         PrintWriter out = response.getWriter();
 
-        NoticiaDAO dao = new NoticiaDAO();
-        List<Noticia> noticias = dao.obtenerTodas();
+        ListarNoticiasDAO dao = new ListarNoticiasDAO();
+        List<Noticia> noticias = dao.listarTodas();
 
         StringBuilder json = new StringBuilder("[");
         for (int i = 0; i < noticias.size(); i++) {

@@ -333,7 +333,7 @@ textarea,
 .grupo-input textarea {
     padding: 1rem;
     background-color: var(--bg-fondo) !important;
-    border: 2px solid transparent;
+    border: 0.125rem solid transparent;
     border-radius: var(--radio-botones);
     font-family: inherit;
     color: var(--texto-principal);
@@ -360,7 +360,7 @@ textarea,
 
 .grupo-input input[type="file"]::file-selector-button {
     background-color: var(--bg-blanco);
-    border: 1px solid var(--lineas-disabled);
+    border: 0.0625rem solid var(--lineas-disabled);
     padding: 0.5rem 1rem;
     border-radius: 0.25rem;
     color: var(--texto-principal);
