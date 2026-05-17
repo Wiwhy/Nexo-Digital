@@ -109,6 +109,14 @@ textarea,
 }
 
 /* --- INICIO ZONA GRID HORIZONTAL ADAPTABLE --- */
+
+/*
+ * align-items: start  →  Cada celda del grid abraza exactamente
+ *                        la altura de su tarjeta. La fila sigue
+ *                        siendo tan alta como la tarjeta más larga,
+ *                        pero las tarjetas más cortas NO se estiran;
+ *                        el espacio sobrante queda vacío debajo.
+ */
 .grid-noticias {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -118,8 +126,14 @@ textarea,
     align-items: start;
 }
 
+/*
+ * display: inline-flex  →  La tarjeta se dimensiona según su contenido
+ *                           en el eje de bloque (alto); no se estira
+ *                           para rellenar la celda del grid.
+ * width: 100%           →  Ocupa todo el ancho disponible de la columna.
+ */
 .tarjeta-noticia {
-    display: flex;
+    display: inline-flex;
     flex-direction: column;
     width: 100%;
     background: var(--bg-blanco);
@@ -141,6 +155,7 @@ textarea,
     object-fit: cover;
     background: var(--bg-fondo);
     display: block;
+    flex-shrink: 0;
 }
 
 .contenido-tarjeta {
@@ -149,6 +164,7 @@ textarea,
     padding: 1.5rem;
     width: 100%;
     box-sizing: border-box;
+    /* Sin flex-grow: la caja blanca solo mide lo que ocupa el título */
 }
 
 .contenido-tarjeta h3 {
