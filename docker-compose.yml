@@ -1,62 +1,172 @@
+# ============================================================
+# DOCKER COMPOSE
+#
+# Docker Compose es una herramienta para definir y gestionar
+# múltiples contenedores Docker que trabajan juntos.
+#
+# En lugar de arrancar cada contenedor manualmente con comandos
+# "docker run" muy largos, este archivo describe todos los
+# servicios en un formato YAML y se arrancan con "docker-compose up".
+#
+# ESTRUCTURA GENERAL:
+# Este archivo define 3 servicios (3 contenedores que trabajan juntos):
+#   1. "app"         → el servidor Java/Tomcat con nuestra aplicación web
+#   2. "mysql"       → la base de datos MySQL
+#   3. "phpmyadmin"  → una interfaz web para gestionar la BD visualmente
+#
+# Los tres están en la misma RED (red_app) para poder comunicarse entre sí.
+# ============================================================
+
+# "services" → define los contenedores que Docker Compose va a gestionar.
 services:
+
+  # ----------------------------------------------------------
+  # SERVICIO 1: app (Tomcat + nuestra aplicación Java)
+  # ----------------------------------------------------------
   app:
+    # build → indica que esta imagen se construye localmente a partir de un Dockerfile,
+    # en lugar de descargarse de Docker Hub.
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: .          # El contexto de build es el directorio actual (donde está el Dockerfile).
+      dockerfile: Dockerfile  # El nombre del Dockerfile a usar.
+    
+    # container_name → nombre del contenedor para identificarlo fácilmente.
     container_name: jakartaee_app
+    
+    # ports → mapeo de puertos: "HOST:CONTENEDOR"
+    # "8080:8080" → el puerto 8080 del HOST (tu ordenador) se conecta al 8080 del contenedor.
+    # Así puedes acceder a la app desde tu navegador en http://localhost:8080
     ports:
       - "8080:8080"
+    
+    # depends_on → define las dependencias entre servicios.
+    # "app" NO arrancará hasta que "mysql" esté listo.
+    # "condition: service_healthy" → espera a que MySQL pase el healthcheck (ver abajo).
+    # Si usáramos solo "depends_on: mysql" sin condition, podría arrancar antes de que MySQL
+    # esté listo para aceptar conexiones, y nuestra app fallaría al conectar.
     depends_on:
       mysql:
         condition: service_healthy
+    
+    # environment → variables de entorno que se inyectan al contenedor.
+    # Son accesibles en Java con System.getenv("nombre").
+    # ConexionDB.java las usa para saber a qué base de datos conectarse.
     environment:
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_NAME: nexo_digital       # Nombre de la base de datos que usará la app
-      DB_USER: root
-      DB_PASSWORD: root
+      DB_HOST: mysql          # El hostname del servidor MySQL es "mysql" (el nombre del servicio)
+      DB_PORT: 3306           # Puerto estándar de MySQL
+      DB_NAME: nexo_digital   # Nombre de la base de datos
+      DB_USER: root           # Usuario de MySQL
+      DB_PASSWORD: root       # Contraseña de MySQL
+    
+    # networks → las redes a las que pertenece este servicio.
+    # Poniéndolos en la misma red, pueden comunicarse entre sí por nombre de servicio.
+    # Ejemplo: el servicio "app" puede conectarse a MySQL usando "mysql" como hostname.
     networks:
       - red_app
 
+
+  # ----------------------------------------------------------
+  # SERVICIO 2: mysql (Base de datos MySQL)
+  # ----------------------------------------------------------
   mysql:
+    # image → imagen oficial de MySQL desde Docker Hub.
+    # "mysql:8.0" es la versión 8.0 de MySQL.
     image: mysql:8.0
-    container_name: mysql_bd_noticias   # Contenedor renombrado para reflejar el nuevo proyecto
+    
+    container_name: mysql_bd_noticias
+    
+    # restart → política de reinicio automático.
+    # "unless-stopped" → el contenedor se reinicia automáticamente si falla,
+    # pero NO se reinicia si el usuario lo paró manualmente.
     restart: unless-stopped
+    
+    # ports → "3307:3306" → el puerto 3306 del contenedor se expone como 3307 en el host.
+    # Usamos 3307 (no 3306) por si ya tienes MySQL instalado localmente en el 3306.
+    # Para conectarte desde tu PC con un cliente SQL (DBeaver, HeidiSQL...): localhost:3307
+    # Los otros contenedores de la misma red Docker usan 3306 directamente.
     ports:
       - "3307:3306"
+    
+    # environment → configuración inicial de MySQL:
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: nexo_digital       # MySQL crea esta BD automáticamente al arrancar
+      MYSQL_ROOT_PASSWORD: root       # Contraseña del usuario root de MySQL.
+      MYSQL_DATABASE: nexo_digital    # MySQL crea esta base de datos automáticamente al arrancar.
+    
+    # volumes → "montajes" de volúmenes: conectan directorios del host con el contenedor.
     volumes:
+      # mysql_data → volumen nombrado de Docker. Persiste los datos de la BD aunque el contenedor
+      # se destruya y se vuelva a crear. Docker gestiona este volumen automáticamente.
       - mysql_data:/var/lib/mysql
+      
+      # ./mysql/init → monta la carpeta local "mysql/init" como el directorio de inicialización de MySQL.
+      # MySQL ejecuta automáticamente los archivos .sql que encuentre en /docker-entrypoint-initdb.d/
+      # Solo los ejecuta la PRIMERA VEZ que se crea el volumen (cuando la BD está vacía).
       - ./mysql/init:/docker-entrypoint-initdb.d
+    
+    # healthcheck → comprueba si el servicio está "sano" y listo para aceptar conexiones.
+    # Docker usa este check para determinar cuándo MySQL está realmente listo.
+    # "depends_on: condition: service_healthy" del servicio "app" espera a que este check pase.
     healthcheck:
+      # "mysqladmin ping" es un comando de MySQL que verifica si el servidor responde.
+      # "-h localhost" → conecta a localhost dentro del contenedor.
+      # "-proot" → usa "root" como contraseña.
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
+      interval: 10s   # Comprueba cada 10 segundos.
+      timeout: 5s     # Si no responde en 5 segundos, se considera fallido.
+      retries: 10     # Intenta hasta 10 veces antes de declarar el servicio como no sano.
+    
     networks:
       - red_app
 
+
+  # ----------------------------------------------------------
+  # SERVICIO 3: phpmyadmin (Interfaz web para la BD)
+  # ----------------------------------------------------------
   phpmyadmin:
+    # phpMyAdmin es una aplicación web para gestionar bases de datos MySQL visualmente.
+    # Es útil para ver las tablas, hacer consultas SQL y administrar datos durante el desarrollo.
     image: phpmyadmin:latest
-    container_name: phpmyadmin_bd_noticias  # Contenedor renombrado para coherencia
+    
+    container_name: phpmyadmin_bd_noticias
     restart: unless-stopped
+    
+    # ports → accesible en http://localhost:8081 desde tu navegador.
     ports:
-      - "8081:80"
+      - "8081:80"    # phpMyAdmin escucha en el puerto 80 dentro del contenedor.
+    
+    # environment → configuración de phpMyAdmin para que sepa a qué MySQL conectarse.
     environment:
-      PMA_HOST: mysql
-      PMA_PORT: 3306
-      PMA_USER: root
-      PMA_PASSWORD: root
+      PMA_HOST: mysql      # Hostname del servidor MySQL (nombre del servicio en Docker).
+      PMA_PORT: 3306       # Puerto de MySQL dentro de la red Docker.
+      PMA_USER: root       # Usuario por defecto para phpMyAdmin.
+      PMA_PASSWORD: root   # Contraseña del usuario.
+    
+    # depends_on → phpMyAdmin espera a que MySQL esté arriba (pero sin condición de healthcheck,
+    # solo que el contenedor esté arrancado, no necesariamente sano).
     depends_on:
       - mysql
+    
     networks:
       - red_app
 
-volumes:
-  mysql_data:
 
+# ============================================================
+# VOLÚMENES NOMBRADOS
+# Los volúmenes nombrados son gestionados por Docker.
+# Se guardan en el sistema del host fuera de los contenedores.
+# Persisten aunque los contenedores se eliminen con "docker-compose down".
+# Para borrar también los datos: "docker-compose down -v"
+# ============================================================
+volumes:
+  mysql_data:    # Nombre del volumen donde MySQL guarda sus datos.
+
+
+# ============================================================
+# REDES
+# Docker crea una red virtual aislada para la comunicación entre contenedores.
+# "bridge" es el driver de red por defecto: crea una red interna.
+# Los servicios en la misma red pueden comunicarse usando su nombre de servicio como hostname.
+# ============================================================
 networks:
   red_app:
     driver: bridge
