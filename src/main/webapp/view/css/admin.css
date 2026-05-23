@@ -1,3 +1,19 @@
+/* ============================================================
+   admin.css — HOJA DE ESTILOS DEL PANEL DE ADMINISTRACIÓN
+   Se carga SOLO en admin.html, complementando a estilos.css.
+   Contiene estilos específicos de: la tarjeta del panel,
+   la lista de noticias, el modal de creación/edición y
+   el selector de archivo personalizado.
+   ============================================================ */
+
+
+/* ============================================================
+   TARJETA DEL PANEL ADMIN
+
+   Es el contenedor blanco principal que envuelve todo el panel.
+   Se diferencia de las tarjetas de noticias en que tiene más
+   padding interior y ocupa todo el ancho disponible.
+   ============================================================ */
 .tarjeta-admin {
     background: var(--bg-blanco);
     border-radius: 1rem !important;
@@ -7,6 +23,14 @@
     width: 100%;
 }
 
+
+/* ============================================================
+   ENCABEZADO DEL PANEL (fila con título + botón "Crear")
+
+   Usa flex para poner el título a la izquierda y el botón
+   a la derecha. La línea de abajo (border-bottom) lo separa
+   visualmente de la lista de noticias.
+   ============================================================ */
 .encabezado-admin {
     display: flex;
     justify-content: space-between;
@@ -16,12 +40,20 @@
     border-bottom: 0.0625rem solid var(--lineas-disabled);
 }
 
+/* Tamaño del h2 dentro del encabezado: más grande que el h2 estándar. */
 .encabezado-admin h2 {
     font-size: 2rem;
     margin: 0 !important;
     line-height: 1 !important;
 }
 
+
+/* ============================================================
+   LISTA DE NOTICIAS EN EL PANEL
+
+   Contenedor vertical donde admin.js inserta dinámicamente
+   una .fila-noticia por cada noticia de la base de datos.
+   ============================================================ */
 .lista-admin {
     display: flex;
     flex-direction: column;
@@ -29,6 +61,15 @@
     padding: 0 !important;
 }
 
+
+/* ============================================================
+   FILA DE CADA NOTICIA EN LA LISTA
+
+   Cada fila tiene: [TÍTULO] ... [Botón Editar]
+   justify-content: space-between → el título a la izquierda,
+     el botón a la derecha.
+   border-bottom → línea divisoria entre filas.
+   ============================================================ */
 .fila-noticia {
     display: flex;
     justify-content: space-between;
@@ -39,14 +80,21 @@
     border-bottom: 0.0625rem solid var(--lineas-disabled);
 }
 
+/* La última fila no necesita línea divisoria ni padding inferior. */
 .fila-noticia:last-child {
     border-bottom: none;
     padding-bottom: 0 !important;
 }
 
+/* Título dentro de cada fila:
+   flex: 1 → ocupa todo el espacio disponible (empuja el botón al extremo derecho).
+   min-width: 0 → propiedad "mágica" de flex: sin ella, el texto no se truncaría
+     con ellipsis porque los ítems flex tienen min-width: auto por defecto.
+   white-space: nowrap + overflow: hidden + text-overflow: ellipsis → si el título
+     es muy largo, muestra "..." al final en lugar de romper el layout. */
 .titulo-noticia-lista {
     flex: 1;
-    min-width: 0; /* This is the magic property that lets flex items shrink below their content size */
+    min-width: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -54,17 +102,33 @@
     display: block;
 }
 
+/* El botón "Editar" no se encoge aunque el espacio sea pequeño. */
 .fila-noticia button {
     flex-shrink: 0 !important;
     margin: 0 !important;
 }
 
+
+/* ============================================================
+   TEXTAREA DEL FORMULARIO DE NOTICIA
+
+   resize: none → desactiva el control de redimensionado manual
+     que los navegadores añaden por defecto en la esquina inferior.
+   min-height → altura mínima para que el campo sea cómodo de usar.
+   ============================================================ */
 textarea {
     resize: none;
     width: 100%;
     min-height: 14rem;
 }
 
+
+/* ============================================================
+   ZONA DE BOTONES DEL MODAL (Guardar + Eliminar)
+
+   Los dos botones se colocan en fila, centrados y separados.
+   justify-content: center → los botones quedan centrados en el modal.
+   ============================================================ */
 .acciones-modal-flex {
     display: flex;
     gap: 1.5rem;
@@ -72,6 +136,9 @@ textarea {
     justify-content: center;
 }
 
+/* Estilos específicos de los botones dentro de la zona de acciones.
+   Se sobreescriben con !important porque los botones heredan estilos
+   de .btn-azul y necesitamos dimensiones fijas independientes. */
 .acciones-modal-flex button {
     background-color: var(--color-primario) !important;
     color: #fff !important;
@@ -84,14 +151,22 @@ textarea {
     height: 2.8rem !important;
     padding: 0 !important;
     margin: 0 !important;
-    flex: none !important;
+    flex: none !important;      /* No se estiran para rellenar el contenedor */
     max-width: none !important;
 }
 
+/* Hover de los botones del modal. */
 .acciones-modal-flex button:hover {
     background-color: var(--color-hover) !important;
 }
 
+
+/* ============================================================
+   DISEÑO ADAPTABLE — MEDIA QUERIES ESPECÍFICAS DEL PANEL
+   ============================================================ */
+
+/* En móviles (hasta 768px): reducir padding y tamaños para que
+   el panel quepa bien en pantallas pequeñas. */
 @media (max-width: 48rem) {
     .tarjeta-admin {
         padding: 1.5rem;
@@ -106,9 +181,26 @@ textarea {
     }
 }
 
+
+/* ============================================================
+   SELECTOR DE ARCHIVO PERSONALIZADO
+
+   El input type="file" nativo no se puede estilizar fácilmente.
+   La solución consiste en:
+     1. Un contenedor (.file-input-wrapper) con el estilo visual.
+     2. Un botón decorativo (.file-input-btn) que NO es funcional.
+     3. Un <span> (.file-input-text) que muestra el nombre del archivo.
+     4. El input real (.file-input-real) colocado de forma invisible
+        encima del contenedor con position:absolute + opacity:0.
+   Al hacer clic en cualquier parte del wrapper, el clic llega
+   al input invisible, que abre el diálogo de selección de archivo.
+   admin.js actualiza el <span> con el nombre del archivo elegido.
+   ============================================================ */
+
+/* Contenedor visual del selector de archivo. */
 .file-input-wrapper {
-    position: relative;
-    overflow: hidden;
+    position: relative;     /* Necesario para que el input absoluto se posicione aquí */
+    overflow: hidden;       /* Recorta el input invisible que sobresale */
     width: 100%;
     padding: 1rem;
     border-radius: var(--radio-botones);
@@ -118,6 +210,8 @@ textarea {
     cursor: pointer;
 }
 
+/* Botón visual (NO funcional): imita el botón nativo del navegador.
+   pointer-events: none → no captura clics (los deja pasar al input invisible). */
 .file-input-btn {
     background-color: var(--bg-blanco);
     border: 0.0625rem solid var(--lineas-disabled);
@@ -131,9 +225,12 @@ textarea {
     margin-right: 1rem;
     transition: background-color 0.2s;
     white-space: nowrap;
-    flex-shrink: 0;
+    flex-shrink: 0;         /* No se encoge aunque el wrapper sea pequeño */
 }
 
+/* Texto que muestra el nombre del archivo elegido o "Ningún archivo seleccionado".
+   text-overflow: ellipsis → si el nombre es muy largo, se trunca con "..."
+   max-width: calc(...) → limita el ancho para que no tape el botón. */
 .file-input-text {
     font-size: 1rem;
     font-family: inherit;
@@ -144,6 +241,11 @@ textarea {
     max-width: calc(100% - 11.25rem);
 }
 
+/* Input de archivo real: invisible, encima de todo el wrapper.
+   opacity: 0 → completamente transparente (pero sigue siendo clickeable).
+   position: absolute + left/top/right/bottom: 0 → ocupa todo el wrapper.
+   Cuando el usuario hace clic en cualquier parte del wrapper,
+   este input es el que recibe el clic y abre el explorador de archivos. */
 .file-input-real {
     position: absolute;
     left: 0;

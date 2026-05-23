@@ -1,52 +1,113 @@
 <!DOCTYPE html>
+<!-- DOCTYPE le dice al navegador que esto es HTML5. -->
 <html lang="es">
+<!-- lang="es" indica idioma español. -->
 
 <head>
+    <!-- HEAD: metadatos, no visibles en pantalla. -->
+
+    <!-- charset=UTF-8: soporta tildes, ñ y caracteres especiales. -->
     <meta charset="UTF-8">
+
+    <!-- viewport: diseño adaptable a distintos tamaños de pantalla. -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Título de la pestaña del navegador. -->
     <title>Noticia - Nexo Digital</title>
+
+    <!-- Favicon: icono en la pestaña. -->
     <link rel="icon" href="img/favicon.png?v=2" type="image/png">
+
+    <!-- preconnect: prepara la conexión con Google Fonts de antemano para carga más rápida. -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Fuente Inter desde Google Fonts. -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Hoja de estilos principal compartida por todas las páginas. -->
     <link rel="stylesheet" href="css/estilos.css?v=14">
 </head>
 
 <body>
 
+    <!-- ===== CABECERA (HEADER) ===================================
+         Barra superior con el logo. Al hacer clic, vuelve al portal.
+    ============================================================= -->
     <header class="cabecera-principal">
         <div class="contenedor-header">
+            <!-- Logo: enlace de vuelta al portal principal. -->
             <a href="index.html" class="logo-link">
                 <h1>Nexo Digital</h1>
             </a>
         </div>
     </header>
 
+    <!-- ===== CONTENIDO PRINCIPAL (MAIN) ==========================
+         Muestra una noticia completa.
+         noticia.js lee el ?id=5 de la URL, pide los datos al servidor
+         y rellena todos los elementos de este <article>.
+    ============================================================= -->
     <main class="contenedor-principal" id="seccion-noticia">
         <article class="noticia-completa">
+
+            <!-- TÍTULO: noticia.js lo rellena con n.titulo cuando llegan los datos.
+                 Empieza con "Cargando..." como estado temporal mientras se carga. -->
             <h2 id="noticia-titulo">Cargando...</h2>
+
+            <!-- META: noticia.js inyecta aquí el autor y la fecha formateada en español.
+                 Empieza vacío y se rellena al recibir la respuesta del servidor. -->
             <div id="noticia-meta" class="meta-noticia"></div>
+
+            <!-- IMAGEN: noticia.js asigna el src y la muestra si la noticia tiene imagen.
+                 display:none la oculta por defecto; si no hay imagen, permanece oculta. -->
             <img id="noticia-imagen" src="" alt="Imagen de la noticia" class="imagen-hero" style="display:none;">
+
+            <!-- CUERPO: noticia.js convierte el texto del contenido en párrafos <p>
+                 y los inyecta aquí. Empieza vacío. -->
             <div id="noticia-cuerpo" class="cuerpo-texto"></div>
+
         </article>
     </main>
 
+    <!-- ===== PIE DE PÁGINA (FOOTER) ==============================
+         Igual que en index.html: enlace legal + controles de sesión.
+         Los "controles" se muestran u ocultan según el estado de login.
+    ============================================================= -->
     <footer class="pie-pagina">
         <div class="contenedor-footer">
+            <!-- Enlace a política de privacidad. -->
             <a href="legal.html" class="btn-texto-azul">Política de privacidad y aviso legal</a>
+
+            <!-- Zona pública: botón "Admin" para abrir el modal de login.
+                 Visible cuando NO hay admin logueado. -->
             <div id="controles-publicos">
                 <button id="btn-abrir-login" class="btn-texto-azul">Admin</button>
             </div>
+
+            <!-- Zona de admin: enlace al panel.
+                 Empieza oculto; noticia.js lo muestra si hay sesión activa. -->
             <div id="controles-admin" style="display:none;">
                 <a href="admin.html" class="btn-texto-azul">Panel de admin</a>
             </div>
         </div>
     </footer>
 
+    <!-- ===== MODAL DE LOGIN ======================================
+         Ventana emergente de login, idéntica a la de index.html.
+         Se necesita aquí también porque esta es una página independiente
+         y cualquier visitante puede querer iniciar sesión desde ella.
+    ============================================================= -->
     <div id="modal-login" class="modal" style="display:none;">
         <div class="modal-contenido">
+
+            <!-- Botón "×" para cerrar el modal sin iniciar sesión. -->
             <button class="cerrar" id="btn-cerrar-login">&times;</button>
+
             <h2>Acceso administrador</h2>
+
+            <!-- Formulario de login. noticia.js intercepta el submit
+                 y lo envía de forma asíncrona con fetch. -->
             <form id="form-login">
                 <div class="grupo-input">
                     <label for="usuario">Usuario:</label>
@@ -61,6 +122,9 @@
         </div>
     </div>
 
+    <!-- ===== JAVASCRIPT ==========================================
+         Se carga al final del body para que el DOM ya exista.
+    ============================================================= -->
     <script src="js/noticia.js"></script>
 </body>
 

@@ -1,61 +1,130 @@
 <!DOCTYPE html>
+<!-- DOCTYPE le dice al navegador que esto es HTML5 (el estándar actual). -->
 <html lang="es">
+<!-- lang="es" indica que el contenido está en español. Lo usan los lectores de pantalla y los buscadores. -->
 
 <head>
+    <!-- HEAD: contiene metadatos (información sobre la página, no visible en pantalla). -->
+
+    <!-- charset=UTF-8: permite mostrar caracteres especiales como tildes, ñ, etc. -->
     <meta charset="UTF-8">
+
+    <!-- viewport: hace que la página sea responsive en móviles.
+         width=device-width → el ancho de la página = ancho real del dispositivo.
+         initial-scale=1.0 → sin zoom inicial. -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Título que aparece en la pestaña del navegador. -->
     <title>Nexo Digital</title>
+
+    <!-- Favicon: el pequeño icono que aparece en la pestaña del navegador. -->
     <link rel="icon" href="img/favicon.png?v=2" type="image/png">
+
+    <!-- preconnect: le dice al navegador que establezca conexión con Google Fonts
+         antes de que la necesite, para cargar la fuente más rápido. -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Carga la fuente "Inter" desde Google Fonts en 4 grosores (400, 500, 600, 700). -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Hoja de estilos principal del proyecto. El ?v=13 fuerza que el navegador
+         no use una versión antigua guardada en caché. -->
     <link rel="stylesheet" href="css/estilos.css?v=13">
 </head>
 
 <body>
+
+    <!-- ===== CABECERA (HEADER) ===================================
+         Barra superior fija con el logo de la página.
+         La clase "cabecera-principal" le da fondo blanco y sombra.
+    ============================================================= -->
     <header class="cabecera-principal">
         <div class="contenedor-header">
+            <!-- Logo: un enlace que al hacer clic recarga la página principal. -->
             <a href="#" class="logo-link">
                 <h1>Nexo Digital</h1>
             </a>
         </div>
     </header>
 
+    <!-- ===== CONTENIDO PRINCIPAL (MAIN) ==========================
+         Aquí se inyectan dinámicamente las tarjetas de noticias.
+         El div "grid-todas" empieza vacío; app.js lo rellena con
+         los datos que recibe del servidor al cargar la página.
+    ============================================================= -->
     <main class="contenedor-principal" id="seccion-feed">
+        <!-- Cuadrícula de noticias. JavaScript crea un <article> por cada
+             noticia y lo inserta aquí. Empieza vacío a propósito. -->
         <div id="grid-todas" class="grid-noticias"></div>
     </main>
 
+    <!-- ===== PIE DE PÁGINA (FOOTER) ==============================
+         Barra inferior con: enlace legal + controles de sesión.
+         Los "controles" se muestran u ocultan según si el admin
+         está logueado o no (lo gestiona app.js con actualizarUI()).
+    ============================================================= -->
     <footer class="pie-pagina">
         <div class="contenedor-footer">
+            <!-- Enlace a la página de política de privacidad. -->
             <a href="legal.html" class="btn-texto-azul">Política de privacidad y aviso legal</a>
+
+            <!-- Zona pública (visible cuando NO hay admin logueado):
+                 muestra el botón "Admin" para abrir el modal de login. -->
             <div id="controles-publicos">
                 <button id="btn-abrir-login" class="btn-texto-azul">Admin</button>
             </div>
+
+            <!-- Zona de admin (visible SOLO cuando hay admin logueado):
+                 muestra un enlace al panel de administración.
+                 Empieza oculto (display:none) y app.js lo muestra si hay sesión. -->
             <div id="controles-admin" style="display:none;">
                 <a href="admin.html" class="btn-texto-azul">Panel de admin</a>
             </div>
         </div>
     </footer>
 
+    <!-- ===== MODAL DE LOGIN ======================================
+         Ventana emergente (modal) para que el administrador inicie sesión.
+         Empieza oculta (display:none). Se muestra al pulsar "Admin".
+         La clase "modal" crea el fondo oscuro semitransparente.
+    ============================================================= -->
     <div id="modal-login" class="modal" style="display:none;">
         <div class="modal-contenido">
+
+            <!-- Botón "×" para cerrar el modal sin iniciar sesión. -->
             <button class="cerrar" id="btn-cerrar-login">&times;</button>
+
             <h2>Acceso administrador</h2>
 
+            <!-- Formulario de login. app.js intercepta el "submit" para
+                 enviarlo de forma asíncrona (sin recargar la página). -->
             <form id="form-login">
+
+                <!-- Campo de texto para el nombre de usuario. -->
                 <div class="grupo-input">
+                    <!-- label for="usuario" asocia la etiqueta con el input de id="usuario".
+                         Esto permite hacer clic en el texto para enfocar el campo. -->
                     <label for="usuario">Usuario:</label>
                     <input type="text" id="usuario" name="usuario" required>
                 </div>
+
+                <!-- Campo de contraseña. type="password" enmascara el texto escrito. -->
                 <div class="grupo-input">
                     <label for="password">Contraseña:</label>
                     <input type="password" id="password" name="password" required>
                 </div>
+
+                <!-- Botón de envío. Al pulsarlo, dispara el evento "submit" del formulario. -->
                 <button type="submit" class="btn-azul btn-grande">Entrar</button>
             </form>
         </div>
     </div>
 
+    <!-- ===== JAVASCRIPT ==========================================
+         Se carga al final del body para que el HTML ya esté cargado
+         cuando el script intente acceder a los elementos del DOM.
+    ============================================================= -->
     <script src="js/app.js"></script>
 </body>
 

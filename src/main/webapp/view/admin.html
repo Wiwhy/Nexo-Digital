@@ -1,87 +1,160 @@
 <!DOCTYPE html>
+<!-- DOCTYPE le dice al navegador que esto es HTML5. -->
 <html lang="es">
+<!-- lang="es" indica idioma español. -->
 
 <head>
+    <!-- HEAD: metadatos de la página, no se ven en pantalla. -->
+
+    <!-- charset=UTF-8: permite tildes, ñ y caracteres especiales. -->
     <meta charset="UTF-8">
+
+    <!-- viewport: hace la página adaptable a móviles y tablets. -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Título en la pestaña del navegador. -->
     <title>Panel de administración - Nexo Digital</title>
+
+    <!-- Favicon: icono en la pestaña del navegador. -->
     <link rel="icon" href="img/favicon.png?v=2" type="image/png">
+
+    <!-- Hoja de estilos compartida por todas las páginas del proyecto. -->
     <link rel="stylesheet" href="css/estilos.css?v=14">
+
+    <!-- Hoja de estilos específica del panel de admin (lista de noticias, modal, etc.). -->
     <link rel="stylesheet" href="css/admin.css?v=14">
 </head>
 
 <body>
 
+    <!-- ===== CABECERA (HEADER) ===================================
+         Barra superior con el logo. Al hacer clic, vuelve al portal.
+    ============================================================= -->
     <header class="cabecera-principal">
         <div class="contenedor-header">
+            <!-- Enlace al portal público. El emoji ⚙️ indica que es el área de admin. -->
             <a href="index.html" class="logo-link">
                 <h1>Nexo Digital ⚙️</h1>
             </a>
         </div>
     </header>
 
+    <!-- ===== CONTENIDO PRINCIPAL (MAIN) ==========================
+         Panel de gestión de noticias.
+         La "tarjeta-admin" es el contenedor blanco con sombra.
+    ============================================================= -->
     <main class="contenedor-principal">
         <div class="tarjeta-admin">
+
+            <!-- Encabezado del panel: título + botón "Crear" -->
             <div class="encabezado-admin">
                 <h2>Gestión de noticias</h2>
+                <!-- Botón para abrir el modal en modo CREACIÓN (sin datos previos).
+                     admin.js escucha el clic y llama a abrirModalNoticia(). -->
                 <button class="btn-azul btn-pequeno" id="btn-nueva-noticia">Crear</button>
             </div>
 
+            <!-- Lista de noticias. Empieza vacía; admin.js la rellena dinámicamente
+                 creando una fila por cada noticia con su botón "Editar". -->
             <div id="lista-noticias" class="lista-admin">
             </div>
+
         </div>
     </main>
 
+    <!-- ===== PIE DE PÁGINA (FOOTER) ==============================
+         Enlace legal + botón de cerrar sesión.
+    ============================================================= -->
     <footer class="pie-pagina">
         <div class="contenedor-footer">
+            <!-- Enlace a la política de privacidad. -->
             <a href="legal.html" class="btn-texto-azul">Política de Privacidad y Aviso Legal</a>
+
+            <!-- Botón de cerrar sesión. admin.js intercepta el clic,
+                 hace POST a /api/sesion con action=logout y redirige al portal. -->
             <a href="#" id="btn-logout" class="btn-texto-azul">Cerrar Sesión</a>
         </div>
     </footer>
 
+    <!-- ===== MODAL DE CREACIÓN / EDICIÓN DE NOTICIAS ============
+         Ventana emergente que sirve para DOS propósitos:
+           - CREAR: el campo oculto "id" está vacío → admin.js POST a /api/noticias
+           - EDITAR: el campo oculto "id" tiene valor → admin.js POST a /api/noticias/actualizar
+         El título del modal (h2) cambia dinámicamente entre "Crear noticia" y "Editar noticia".
+         Empieza oculto (display:none); se muestra al pulsar "Crear" o "Editar".
+    ============================================================= -->
     <div id="modal-noticia" class="modal" style="display:none;">
         <div class="modal-contenido">
+
+            <!-- Botón "×" para cerrar el modal sin guardar nada. -->
             <button class="cerrar" id="btn-cerrar-modal-noticia">&times;</button>
+
+            <!-- Título del modal. admin.js lo cambia a "Crear noticia" o "Editar noticia". -->
             <h2 id="modal-noticia-titulo">Editar noticia</h2>
 
+            <!-- enctype="multipart/form-data" es obligatorio cuando el formulario
+                 incluye archivos (imágenes). Sin esto, el servidor no puede leer la imagen. -->
             <form id="form-noticia" enctype="multipart/form-data">
+
+                <!-- Campo OCULTO con el ID de la noticia a editar.
+                     Si está vacío → modo CREAR.
+                     Si tiene valor → modo EDITAR (el servlet usará UPDATE en vez de INSERT). -->
                 <input type="hidden" name="id" id="noticia-id">
 
+                <!-- Campo: Título de la noticia. -->
                 <div class="grupo-input">
                     <label for="noticia-titulo-input">Título:</label>
                     <input type="text" id="noticia-titulo-input" name="titulo" required>
                 </div>
 
+                <!-- Campo: Autor de la noticia. -->
                 <div class="grupo-input">
                     <label for="noticia-autor-input">Autor:</label>
                     <input type="text" id="noticia-autor-input" name="autor" required>
                 </div>
 
+                <!-- Campo: Cuerpo/contenido de la noticia. Usa textarea para texto largo. -->
                 <div class="grupo-input">
                     <label for="noticia-contenido">Contenido:</label>
                     <textarea id="noticia-contenido" name="contenido" required></textarea>
                 </div>
 
+                <!-- Campo: Imagen de la noticia (opcional).
+                     El input real (type="file") está invisible encima del botón visual.
+                     Esto permite personalizar el aspecto del selector de archivos. -->
                 <div class="grupo-input">
                     <label for="noticia-imagen">Imagen:</label>
                     <div class="file-input-wrapper">
-                        <button type="button" class="file-input-btn">Seleccionar
-                            archivo</button>
-                        <span id="file-input-text" class="file-input-text">Ningún
-                            archivo seleccionado</span>
-                        <input type="file" id="noticia-imagen" name="imagen" accept="image/*"
-                            class="file-input-real">
+                        <!-- Botón visual (no funcional, solo decorativo). -->
+                        <button type="button" class="file-input-btn">Seleccionar archivo</button>
+                        <!-- Texto que muestra el nombre del archivo seleccionado.
+                             admin.js lo actualiza cuando se elige una imagen. -->
+                        <span id="file-input-text" class="file-input-text">Ningún archivo seleccionado</span>
+                        <!-- Input real, invisible encima de todo. Cuando el usuario
+                             hace clic en cualquier parte del wrapper, activa este input. -->
+                        <input type="file" id="noticia-imagen" name="imagen" accept="image/*" class="file-input-real">
                     </div>
                 </div>
 
+                <!-- Zona de botones de acción del modal. -->
                 <div class="acciones-modal-flex">
+                    <!-- Botón GUARDAR/CREAR: envía el formulario (dispara el evento submit).
+                         Su texto cambia entre "Guardar" (edición) y "Crear" (creación). -->
                     <button type="submit" class="btn-azul btn-grande" id="btn-guardar-modal">Guardar</button>
+
+                    <!-- Botón ELIMINAR: solo visible en modo edición.
+                         admin.js lo oculta (display:none) cuando el modal está en modo creación.
+                         Al hacer clic, llama a eliminarNoticia() con confirmación previa. -->
                     <button type="button" class="btn-azul btn-grande" id="btn-eliminar-modal">Eliminar</button>
                 </div>
             </form>
         </div>
     </div>
 
+    <!-- ===== JAVASCRIPT ==========================================
+         Se carga al final del body para que el DOM ya exista
+         cuando el script intenta acceder a los elementos HTML.
+    ============================================================= -->
     <script src="js/admin.js"></script>
 </body>
 
