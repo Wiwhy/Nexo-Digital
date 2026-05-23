@@ -11,22 +11,6 @@
 
 
 /* ==========================================================================
-   FUNCIÓN PRINCIPAL DE ARRANQUE
-   ========================================================================== */
-
-// inicializarPagina() lanza las dos operaciones al arrancar la página.
-// No necesita ser async porque .then()/.catch() ya gestionan la asincronía.
-function inicializarPagina() {
-    // Llamamos a cargarNoticias() que devuelve una Promise.
-    // Con .then() encadenamos lo que queremos hacer cuando termine (comprobar sesión).
-    // De este modo comprobarSesion() se ejecuta DESPUÉS de que las noticias se carguen.
-    cargarNoticias().then(function() {
-        comprobarSesion();
-    });
-}
-
-
-/* ==========================================================================
    EVENTOS (LISTENERS)
 
    'DOMContentLoaded' se dispara cuando el navegador terminó de leer el HTML
@@ -34,7 +18,14 @@ function inicializarPagina() {
    manipular elementos, porque antes podrían no existir todavía.
    ========================================================================== */
 document.addEventListener('DOMContentLoaded', function() {
-    inicializarPagina();
+
+    // Primero cargamos las noticias. Cuando terminen, comprobamos la sesión
+    // para mostrar u ocultar los controles de admin en el header.
+    // Usamos .then() para asegurarnos de que comprobarSesion() se ejecute
+    // DESPUÉS de que las noticias ya estén en el DOM.
+    cargarNoticias().then(function() {
+        comprobarSesion();
+    });
 
     // Al hacer clic en "Iniciar sesión" → abrimos el modal de login.
     document.getElementById('btn-abrir-login').onclick = function() {
@@ -231,19 +222,3 @@ function actualizarUI(logueado) {
     }
 }
 
-
-/* ==========================================================================
-   REAJUSTE AUTOMÁTICO AL CAMBIAR DE PESTAÑA (REFLOW BUG FIX)
-
-   Algunos navegadores tienen un bug con el layout de columnas CSS
-   (column-count) cuando se vuelve a una pestaña. Forzar un resize lo corrige.
-   ========================================================================== */
-document.addEventListener('visibilitychange', function() {
-    if (document.visibilityState === 'visible') {
-        window.dispatchEvent(new Event('resize'));
-    }
-});
-
-window.addEventListener('pageshow', function() {
-    window.dispatchEvent(new Event('resize'));
-});

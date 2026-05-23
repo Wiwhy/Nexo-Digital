@@ -214,16 +214,3 @@ function actualizarUI(logueado) {
     }
 }
 
-
-/* ==========================================================================
-   REAJUSTE AUTOMÁTICO AL CAMBIAR DE PESTAÑA (REFLOW BUG FIX)
-   ========================================================================== */
-document.addEventListener('visibilitychange', function() {
-    if (document.visibilityState === 'visible') {
-        window.dispatchEvent(new Event('resize'));
-    }
-});
-
-window.addEventListener('pageshow', function() {
-    window.dispatchEvent(new Event('resize'));
-});

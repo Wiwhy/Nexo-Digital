@@ -165,7 +165,7 @@ function renderTablaNoticias() {
         // .replace(/'/g, "&apos;") reemplaza comillas simples para no romper el HTML.
         fila.innerHTML =
             '<span class="titulo-noticia-lista">' + n.titulo + '</span>' +
-            '<button class="btn-azul btn-pequeno" onclick=\'editarNoticia(' +
+            '<button class="btn-azul btn-pequeno" onclick=\'abrirModalNoticia(' +
             JSON.stringify(n).replace(/'/g, '&apos;') +
             ')\'>Editar</button>';
 
@@ -239,16 +239,6 @@ function abrirModalNoticia(noticia) {
     }
 
     abrirModal('modal-noticia');
-}
-
-/* --------------------------------------------------------------------------
-   FUNCIÓN: editarNoticia
-
-   Función intermediaria llamada desde el botón "Editar" de cada fila.
-   Recibe el objeto noticia y abre el modal en modo edición.
-   -------------------------------------------------------------------------- */
-function editarNoticia(noticiaObj) {
-    abrirModalNoticia(noticiaObj);
 }
 
 
@@ -350,20 +340,6 @@ function eliminarNoticia(id) {
    ========================================================================== */
 function abrirModal(id) { document.getElementById(id).style.display = 'flex'; }
 function cerrarModal(id) { document.getElementById(id).style.display = 'none'; }
-
-
-/* ==========================================================================
-   REAJUSTE AUTOMÁTICO AL CAMBIAR DE PESTAÑA (REFLOW BUG FIX)
-   ========================================================================== */
-document.addEventListener('visibilitychange', function() {
-    if (document.visibilityState === 'visible') {
-        window.dispatchEvent(new Event('resize'));
-    }
-});
-
-window.addEventListener('pageshow', function() {
-    window.dispatchEvent(new Event('resize'));
-});
 
 
 /* ==========================================================================
