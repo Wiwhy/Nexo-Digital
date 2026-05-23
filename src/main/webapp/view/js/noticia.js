@@ -14,7 +14,8 @@
    INICIALIZACIÓN AL CARGAR LA PÁGINA
    ========================================================================== */
 
-    // Carga los datos de la noticia cuyo ID viene en la URL.
+    document.addEventListener('DOMContentLoaded', function() {
+// Carga los datos de la noticia cuyo ID viene en la URL.
     cargarNoticiaIndividual();
     
     // Comprueba si hay admin logueado (para mostrar/ocultar controles de admin).
@@ -31,6 +32,8 @@
     };
     
     document.getElementById('form-login').onsubmit = iniciarSesion;
+});
+
 /* ==========================================================================
    CARGA DE LA NOTICIA INDIVIDUAL
    ========================================================================== */
@@ -202,5 +205,6 @@ function actualizarInterfazUsuario(estaLogueado) {
         controlesDelPublico.style.display = 'block';
     }
 }
+
 
 

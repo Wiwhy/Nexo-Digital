@@ -14,7 +14,7 @@
     protege la página (no que el enlace sea difícil de encontrar).
 
     CONEXIÓN HTML → JS → SERVIDOR:
-      El <script src="js/admin.js"> al final del body es el "pegamento"
+      El <script src="js/admin.js?v=2"> al final del body es el "pegamento"
       que une este HTML con la lógica Java del backend.
       admin.js usa los "id" de los elementos HTML para identificarlos
       y añadirles comportamiento. Sin ese id, el JS no puede encontrarlos.
@@ -278,7 +278,7 @@
          document.getElementById('boton-nueva-noticia') devolverían null
          porque ese elemento aún no existiría en el DOM.
     ============================================================= -->
-    <script src="js/admin.js"></script>
+    <script src="js/admin.js?v=2"></script>
 </body>
 
 </html>

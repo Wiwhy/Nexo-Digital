@@ -21,7 +21,8 @@
 // Cuando el DOM esté listo, ejecutamos la inicialización.
 
 
-    // LO PRIMERO: verificamos si hay sesión de admin.
+    document.addEventListener('DOMContentLoaded', function() {
+// LO PRIMERO: verificamos si hay sesión de admin.
     // Si no la hay, redirigimos a index.html.
     comprobarSesionAdmin();
 
@@ -41,6 +42,8 @@
 
     // Botón "Cerrar sesión" → llama a cerrarSesion().
     document.getElementById('boton-cerrar-sesion').onclick = cerrarSesion;
+});
+
 /* ==========================================================================
    VERIFICACIÓN DE SESIÓN DE ADMIN
    ========================================================================== */
@@ -357,3 +360,4 @@ document.getElementById('noticia-imagen').addEventListener('change', function() 
         elementoTextoArchivoHtml.textContent = 'Ningún archivo seleccionado';
     }
 });
+

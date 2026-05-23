@@ -18,7 +18,8 @@
    ========================================================================== */
 
 
-    // Primero cargamos las noticias. Cuando terminen, comprobamos la sesión
+    document.addEventListener('DOMContentLoaded', function() {
+// Primero cargamos las noticias. Cuando terminen, comprobamos la sesión
     // para mostrar u ocultar los controles de admin en el header.
     // Usamos .then() para asegurarnos de que comprobarSesion() se ejecute
     // DESPUÉS de que las noticias ya estén en el DOM.
@@ -39,6 +40,8 @@
 
     // Al enviar el formulario de login → llamamos a iniciarSesion().
     document.getElementById('form-login').onsubmit = iniciarSesion;
+});
+
 /* ==========================================================================
    PETICIONES AL BACKEND (SERVLETS JAVA) Y PINTADO DEL DOM
    ========================================================================== */
@@ -213,5 +216,6 @@ function actualizarInterfazUsuario(estaLogueado) {
         controlesDelPublico.style.display = 'block';
     }
 }
+
 
 
