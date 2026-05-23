@@ -80,27 +80,21 @@ public class ConexionDB {
     public static Connection obtenerConexion() throws SQLException {
 
         // Leemos el HOST (dirección) del servidor MySQL.
-        // Primero intenta con "DB_HOST" (variable genérica que ponemos en docker-compose).
-        // Si no existe, intenta con "MYSQLHOST" (variable que inyecta Railway automáticamente).
-        // Si tampoco existe, usa "mysql_bd_noticias" (el nombre del contenedor Docker en local).
-        String host = getEnv("DB_HOST", getEnv("MYSQLHOST", "mysql_bd_noticias"));
+        // Soporta DB_HOST (custom), MYSQL_HOST (Railway actual) y MYSQLHOST (Railway Legacy).
+        String host = getEnv("DB_HOST", getEnv("MYSQL_HOST", getEnv("MYSQLHOST", "mysql_bd_noticias")));
 
         // Leemos el PUERTO de MySQL.
-        // Por defecto MySQL usa el puerto 3306.
-        String port = getEnv("DB_PORT", getEnv("MYSQLPORT", "3306"));
+        String port = getEnv("DB_PORT", getEnv("MYSQL_PORT", getEnv("MYSQLPORT", "3306")));
 
         // Leemos el NOMBRE de la base de datos.
-        // En Railway la base de datos suele llamarse "railway" por defecto.
-        // En local la llamamos "nexo_digital" (según docker-compose.yml).
-        String database = getEnv("DB_NAME", getEnv("MYSQLDATABASE", "railway"));
+        // En Railway la base de datos suele llamarse "railway" por defecto. En local "nexo_digital".
+        String database = getEnv("DB_NAME", getEnv("MYSQL_DATABASE", getEnv("MYSQLDATABASE", "railway")));
 
         // Leemos el USUARIO de MySQL.
-        // Por defecto usamos "root".
-        String user = getEnv("DB_USER", getEnv("MYSQLUSER", "root"));
+        String user = getEnv("DB_USER", getEnv("MYSQL_USER", getEnv("MYSQLUSER", "root")));
 
         // Leemos la CONTRASEÑA de MySQL.
-        // Por defecto usamos "root" (solo válido para desarrollo local, nunca en producción real).
-        String password = getEnv("DB_PASSWORD", getEnv("MYSQLPASSWORD", "root"));
+        String password = getEnv("DB_PASSWORD", getEnv("MYSQL_PASSWORD", getEnv("MYSQLPASSWORD", "root")));
 
         // Construimos la URL de conexión JDBC (Java DataBase Connectivity).
         // El formato es: jdbc:mysql://HOST:PUERTO/BASE_DE_DATOS?opciones
