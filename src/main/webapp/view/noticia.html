@@ -1,113 +1,197 @@
 <!DOCTYPE html>
-<!-- DOCTYPE le dice al navegador que esto es HTML5. -->
+<!--
+    ============================================================
+    CÓMO SE CONECTA ESTE ARCHIVO CON EL RESTO DEL PROYECTO
+    ============================================================
+
+    noticia.html muestra el contenido completo de UNA sola noticia.
+    Cuando el usuario hace clic en una tarjeta en index.html,
+    app.js redirige a esta URL: "noticia.html?id=5"
+
+    El "?id=5" se llama PARÁMETRO DE CONSULTA (query parameter).
+    noticia.js lo lee con URLSearchParams y lo usa para pedir
+    al servidor los datos de esa noticia concreta.
+
+    TODOS los elementos de contenido (título, autor, fecha, imagen,
+    cuerpo) empiezan VACÍOS o con texto de carga ("Cargando...").
+    noticia.js los rellena cuando recibe la respuesta del servidor.
+
+    FLUJO GENERAL AL ABRIR ESTA PÁGINA:
+      1. El navegador descarga noticia.html (con todos los elementos vacíos).
+      2. Al llegar al <script>, carga noticia.js.
+      3. noticia.js espera DOMContentLoaded y luego:
+         a) Llama a cargarNoticiaIndividual()
+            → lee ?id=5 de la URL
+            → fetch GET /api/noticias/obtener?id=5
+            → ObtenerNoticiaServlet → ObtenerNoticiaDAO
+            → SELECT * FROM noticias WHERE id=5
+            → rellena los elementos del <article>.
+         b) Llama a comprobarSesion()
+            → fetch GET /api/sesion
+            → SesionServlet
+            → muestra/oculta controles de admin en el footer.
+    ============================================================
+-->
 <html lang="es">
-<!-- lang="es" indica idioma español. -->
 
 <head>
-    <!-- HEAD: metadatos, no visibles en pantalla. -->
-
-    <!-- charset=UTF-8: soporta tildes, ñ y caracteres especiales. -->
     <meta charset="UTF-8">
-
-    <!-- viewport: diseño adaptable a distintos tamaños de pantalla. -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Título de la pestaña del navegador. -->
     <title>Noticia - Nexo Digital</title>
-
-    <!-- Favicon: icono en la pestaña. -->
     <link rel="icon" href="img/favicon.png?v=2" type="image/png">
-
-    <!-- preconnect: prepara la conexión con Google Fonts de antemano para carga más rápida. -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <!-- Fuente Inter desde Google Fonts. -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Hoja de estilos principal compartida por todas las páginas. -->
     <link rel="stylesheet" href="css/estilos.css?v=14">
 </head>
 
 <body>
 
-    <!-- ===== CABECERA (HEADER) ===================================
-         Barra superior con el logo. Al hacer clic, vuelve al portal.
-    ============================================================= -->
     <header class="cabecera-principal">
         <div class="contenedor-header">
-            <!-- Logo: enlace de vuelta al portal principal. -->
             <a href="index.html" class="logo-link">
                 <h1>Nexo Digital</h1>
             </a>
         </div>
     </header>
 
-    <!-- ===== CONTENIDO PRINCIPAL (MAIN) ==========================
-         Muestra una noticia completa.
-         noticia.js lee el ?id=5 de la URL, pide los datos al servidor
-         y rellena todos los elementos de este <article>.
+    <!-- ===== ARTÍCULO DE LA NOTICIA COMPLETA ====================
+         Todos los elementos empiezan vacíos.
+
+         RUTA LÓGICA (automática al cargar la página):
+           1. [noticia.html] El navegador carga la página. El <article>
+                  está vacío excepto "Cargando..." en el h2.
+           2. [noticia.js] DOMContentLoaded dispara cargarNoticiaIndividual().
+           3. [noticia.js] Extrae el ID de la URL actual:
+                  var params  = new URLSearchParams(window.location.search)
+                  var idParam = params.get('id')
+                  → Si la URL es "noticia.html?id=5", idParam = "5"
+                  → Si no hay ?id en la URL, muestra "Noticia no encontrada" y para.
+           4. [noticia.js] Hace:
+                  fetch GET '../api/noticias/obtener?id=5'
+           5. [Tomcat] La URL '/api/noticias/obtener' coincide con:
+                  ObtenerNoticiaServlet.java → doGet()
+           6. [ObtenerNoticiaServlet]:
+                  Lee el parámetro "id" de la URL con request.getParameter("id").
+                  Convierte "5" a entero con Integer.parseInt("5").
+                  Llama a ObtenerNoticiaDAO.obtenerPorId(5).
+           7. [ObtenerNoticiaDAO] Ejecuta en MySQL:
+                  SELECT * FROM noticias WHERE id=5
+           8. [MySQL] Devuelve esa fila concreta (o nada si no existe).
+           9. [ObtenerNoticiaDAO] Construye un objeto Noticia con los datos.
+          10. [ObtenerNoticiaServlet]:
+                  Si encontró la noticia → usa Gson para convertir el objeto
+                    Noticia a JSON automáticamente → responde HTTP 200.
+                  Si no existe → responde HTTP 404.
+          11. [noticia.js] El .then() comprueba res.ok:
+                  Si 404 → lanza Error → el .catch() escribe "Error al cargar".
+                  Si 200 → recibe el objeto JSON con los datos de la noticia:
+                    - #noticia-titulo.textContent = n.titulo
+                    - #noticia-meta → inyecta autor y fecha formateada en español
+                    - #noticia-imagen → si hay imagen, asigna src y muestra.
+                      La imagen se obtiene de "../uploads/nombreArchivo.jpg"
+                      → ServirImagenServlet.java intercepta esa URL,
+                        busca el archivo en disco y lo envía al navegador.
+                    - #noticia-cuerpo → divide el contenido en párrafos <p>
+                      por cada salto de línea (\n) y los inyecta.
     ============================================================= -->
     <main class="contenedor-principal" id="seccion-noticia">
         <article class="noticia-completa">
 
-            <!-- TÍTULO: noticia.js lo rellena con n.titulo cuando llegan los datos.
-                 Empieza con "Cargando..." como estado temporal mientras se carga. -->
+            <!-- Relleno por noticia.js con n.titulo al recibir la respuesta. -->
             <h2 id="noticia-titulo">Cargando...</h2>
 
-            <!-- META: noticia.js inyecta aquí el autor y la fecha formateada en español.
-                 Empieza vacío y se rellena al recibir la respuesta del servidor. -->
+            <!-- Relleno por noticia.js con autor y fecha formateada.
+                 Ejemplo: <span>María García</span><span>23 de mayo de 2026</span> -->
             <div id="noticia-meta" class="meta-noticia"></div>
 
-            <!-- IMAGEN: noticia.js asigna el src y la muestra si la noticia tiene imagen.
-                 display:none la oculta por defecto; si no hay imagen, permanece oculta. -->
+            <!-- display:none por defecto.
+                 noticia.js lo muestra y asigna el src solo si la noticia tiene imagen.
+                 La URL "../uploads/abc123.jpg" es interceptada por ServirImagenServlet. -->
             <img id="noticia-imagen" src="" alt="Imagen de la noticia" class="imagen-hero" style="display:none;">
 
-            <!-- CUERPO: noticia.js convierte el texto del contenido en párrafos <p>
-                 y los inyecta aquí. Empieza vacío. -->
+            <!-- Relleno por noticia.js con párrafos <p> del contenido de la noticia. -->
             <div id="noticia-cuerpo" class="cuerpo-texto"></div>
 
         </article>
     </main>
 
-    <!-- ===== PIE DE PÁGINA (FOOTER) ==============================
-         Igual que en index.html: enlace legal + controles de sesión.
-         Los "controles" se muestran u ocultan según el estado de login.
-    ============================================================= -->
     <footer class="pie-pagina">
         <div class="contenedor-footer">
-            <!-- Enlace a política de privacidad. -->
             <a href="legal.html" class="btn-texto-azul">Política de privacidad y aviso legal</a>
 
-            <!-- Zona pública: botón "Admin" para abrir el modal de login.
-                 Visible cuando NO hay admin logueado. -->
+            <!-- ===== ZONA DE CONTROLES DE SESIÓN ====================
+                 Idéntica a la de index.html.
+
+                 RUTA LÓGICA (automática al cargar la página):
+                   1. [noticia.js] DOMContentLoaded también dispara comprobarSesion().
+                   2. [noticia.js] comprobarSesion() hace:
+                          fetch GET '../api/sesion'
+                   3. [Tomcat] → SesionServlet.java → doGet()
+                   4. [SesionServlet]:
+                          request.getSession(false) → obtiene sesión sin crear una nueva.
+                          Comprueba si tiene el atributo "adminLogueado".
+                          Responde: {"logueado": true/false, "usuario": "..."}
+                   5. [noticia.js] actualizarUI(data.logueado):
+                          Si logueado=true  → muestra #controles-admin.
+                          Si logueado=false → muestra #controles-publicos.
+            ======================================================= -->
             <div id="controles-publicos">
+                <!-- ===== BOTÓN "Admin" ================================
+                     RUTA LÓGICA:
+                       1. [noticia.html] Botón con id="btn-abrir-login".
+                       2. [noticia.js] DOMContentLoaded asigna:
+                              document.getElementById('btn-abrir-login').onclick
+                              = function() { abrirModal('modal-login'); }
+                       3. abrirModal(): style.display = 'flex' → modal visible.
+                       ⚠️ No contacta al servidor. Solo muestra el modal.
+                ========================================================= -->
                 <button id="btn-abrir-login" class="btn-texto-azul">Admin</button>
             </div>
 
-            <!-- Zona de admin: enlace al panel.
-                 Empieza oculto; noticia.js lo muestra si hay sesión activa. -->
+            <!-- Visible solo si hay admin logueado. -->
             <div id="controles-admin" style="display:none;">
                 <a href="admin.html" class="btn-texto-azul">Panel de admin</a>
             </div>
         </div>
     </footer>
 
-    <!-- ===== MODAL DE LOGIN ======================================
-         Ventana emergente de login, idéntica a la de index.html.
-         Se necesita aquí también porque esta es una página independiente
-         y cualquier visitante puede querer iniciar sesión desde ella.
+    <!-- ===== MODAL DE LOGIN =====================================
+         Idéntico al de index.html. Se necesita aquí también porque
+         esta es una página completamente independiente: tiene su propio
+         HTML, su propio JS (noticia.js) y su propio DOM.
+
+         RUTA LÓGICA al enviar el formulario:
+           1. [noticia.html] Formulario id="form-login".
+           2. [noticia.js] DOMContentLoaded asigna:
+                  document.getElementById('form-login').onsubmit = iniciarSesion
+           3. [noticia.js] iniciarSesion(e):
+                  e.preventDefault()
+                  Lee usuario y password de los campos.
+                  fetch POST '../api/login'
+                  body: 'usuario=X&password=Y'
+           4. [Tomcat] → LoginServlet.java → doPost()
+           5. [LoginServlet] → LoginDAO.autenticar(usuario, password)
+           6. [LoginDAO]:
+                  SELECT * FROM administradores WHERE usuario=? AND password_hash=?
+           7. [MySQL] Devuelve la fila si las credenciales son correctas.
+           8. [LoginServlet]:
+                  Si correcto → session.setAttribute("adminLogueado", true)
+                    Responde HTTP 200.
+                  Si incorrecto → Responde HTTP 401.
+           9. [noticia.js] El .then() comprueba res.ok:
+                  Si true  → window.location.href = 'admin.html'
+                  Si false → alert('Usuario o contraseña incorrectos')
+
+         BOTÓN CERRAR:
+           1. [noticia.html] id="btn-cerrar-login".
+           2. [noticia.js] onclick → cerrarModal('modal-login')
+              → style.display = 'none'.
     ============================================================= -->
     <div id="modal-login" class="modal" style="display:none;">
         <div class="modal-contenido">
-
-            <!-- Botón "×" para cerrar el modal sin iniciar sesión. -->
             <button class="cerrar" id="btn-cerrar-login">&times;</button>
-
             <h2>Acceso administrador</h2>
-
-            <!-- Formulario de login. noticia.js intercepta el submit
-                 y lo envía de forma asíncrona con fetch. -->
             <form id="form-login">
                 <div class="grupo-input">
                     <label for="usuario">Usuario:</label>
@@ -123,7 +207,9 @@
     </div>
 
     <!-- ===== JAVASCRIPT ==========================================
-         Se carga al final del body para que el DOM ya exista.
+         noticia.js se carga al final del body.
+         Contiene las mismas funciones de login y sesión que app.js,
+         duplicadas porque es una página independiente con su propio DOM.
     ============================================================= -->
     <script src="js/noticia.js"></script>
 </body>

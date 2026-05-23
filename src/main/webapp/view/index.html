@@ -1,129 +1,191 @@
 <!DOCTYPE html>
-<!-- DOCTYPE le dice al navegador que esto es HTML5 (el estándar actual). -->
+<!--
+    ============================================================
+    CÓMO SE CONECTA ESTE ARCHIVO CON EL RESTO DEL PROYECTO
+    ============================================================
+
+    index.html es la primera página que ve el usuario.
+    No tiene lógica propia: solo define la estructura visual (HTML)
+    y delega TODA la lógica al archivo "app.js" que se carga al final.
+
+    La conexión funciona así:
+      1. El navegador descarga y muestra este HTML.
+      2. Al llegar al final del <body>, carga app.js con <script>.
+      3. app.js espera el evento "DOMContentLoaded" (que se dispara
+         cuando el HTML ya está completamente leído y construido).
+      4. Desde ese momento, app.js puede buscar elementos por su "id"
+         y añadirles comportamiento (onclick, onsubmit, etc.).
+      5. Cuando el usuario interactúa, app.js hace peticiones fetch()
+         a URLs del tipo "../api/...". Esas URLs las gestiona Tomcat,
+         que las redirige al Servlet Java correcto según la anotación
+         @WebServlet que cada Servlet tiene definida.
+
+    RESUMEN DEL FLUJO GENERAL:
+      [HTML: elemento con id] → [app.js: event listener por ese id]
+        → [fetch() a una URL] → [Tomcat: busca el Servlet con @WebServlet]
+          → [Servlet Java: lee, valida, llama al DAO]
+            → [DAO: ejecuta SQL en MySQL]
+              → [MySQL devuelve resultado]
+            → [DAO: devuelve objeto Java]
+          → [Servlet: convierte a JSON, envía respuesta HTTP]
+        → [app.js: .then() recibe el JSON]
+      → [app.js: actualiza el DOM (lo que el usuario ve)]
+    ============================================================
+-->
 <html lang="es">
-<!-- lang="es" indica que el contenido está en español. Lo usan los lectores de pantalla y los buscadores. -->
 
 <head>
-    <!-- HEAD: contiene metadatos (información sobre la página, no visible en pantalla). -->
-
-    <!-- charset=UTF-8: permite mostrar caracteres especiales como tildes, ñ, etc. -->
     <meta charset="UTF-8">
-
-    <!-- viewport: hace que la página sea responsive en móviles.
-         width=device-width → el ancho de la página = ancho real del dispositivo.
-         initial-scale=1.0 → sin zoom inicial. -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Título que aparece en la pestaña del navegador. -->
     <title>Nexo Digital</title>
-
-    <!-- Favicon: el pequeño icono que aparece en la pestaña del navegador. -->
     <link rel="icon" href="img/favicon.png?v=2" type="image/png">
-
-    <!-- preconnect: le dice al navegador que establezca conexión con Google Fonts
-         antes de que la necesite, para cargar la fuente más rápido. -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <!-- Carga la fuente "Inter" desde Google Fonts en 4 grosores (400, 500, 600, 700). -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Hoja de estilos principal del proyecto. El ?v=13 fuerza que el navegador
-         no use una versión antigua guardada en caché. -->
+    <!-- Hoja de estilos: solo da el aspecto visual, no tiene lógica. -->
     <link rel="stylesheet" href="css/estilos.css?v=13">
 </head>
 
 <body>
 
-    <!-- ===== CABECERA (HEADER) ===================================
-         Barra superior fija con el logo de la página.
-         La clase "cabecera-principal" le da fondo blanco y sombra.
-    ============================================================= -->
     <header class="cabecera-principal">
         <div class="contenedor-header">
-            <!-- Logo: un enlace que al hacer clic recarga la página principal. -->
             <a href="#" class="logo-link">
                 <h1>Nexo Digital</h1>
             </a>
         </div>
     </header>
 
-    <!-- ===== CONTENIDO PRINCIPAL (MAIN) ==========================
-         Aquí se inyectan dinámicamente las tarjetas de noticias.
-         El div "grid-todas" empieza vacío; app.js lo rellena con
-         los datos que recibe del servidor al cargar la página.
+    <!-- ===== CUADRÍCULA DE NOTICIAS =============================
+         Este div empieza VACÍO en el HTML.
+
+         RUTA LÓGICA (automática al cargar la página):
+           1. [index.html] El navegador llega al <script src="js/app.js">.
+           2. [app.js] DOMContentLoaded dispara cargarNoticias().
+           3. [app.js] cargarNoticias() hace:
+                  fetch GET '../api/noticias/listar'
+           4. [Tomcat] La URL '/api/noticias/listar' coincide con la
+                  anotación @WebServlet("/api/noticias/listar") de:
+                  ListarNoticiasServlet.java → método doGet()
+           5. [ListarNoticiasServlet] Crea ListarNoticiasDAO y llama a listarTodas().
+           6. [ListarNoticiasDAO] Ejecuta en MySQL:
+                  SELECT * FROM noticias ORDER BY fecha_publicacion DESC
+           7. [MySQL] Devuelve todas las filas de la tabla.
+           8. [ListarNoticiasDAO] Construye una List<Noticia> con los resultados.
+           9. [ListarNoticiasServlet] Convierte la lista a texto JSON y lo envía.
+          10. [app.js] El .then() recibe el JSON, crea un <article> por cada
+                  noticia y lo inserta aquí (en #grid-todas).
     ============================================================= -->
     <main class="contenedor-principal" id="seccion-feed">
-        <!-- Cuadrícula de noticias. JavaScript crea un <article> por cada
-             noticia y lo inserta aquí. Empieza vacío a propósito. -->
         <div id="grid-todas" class="grid-noticias"></div>
     </main>
 
-    <!-- ===== PIE DE PÁGINA (FOOTER) ==============================
-         Barra inferior con: enlace legal + controles de sesión.
-         Los "controles" se muestran u ocultan según si el admin
-         está logueado o no (lo gestiona app.js con actualizarUI()).
-    ============================================================= -->
     <footer class="pie-pagina">
         <div class="contenedor-footer">
-            <!-- Enlace a la página de política de privacidad. -->
             <a href="legal.html" class="btn-texto-azul">Política de privacidad y aviso legal</a>
 
-            <!-- Zona pública (visible cuando NO hay admin logueado):
-                 muestra el botón "Admin" para abrir el modal de login. -->
+            <!-- ===== ZONA DE CONTROLES DE SESIÓN ====================
+                 Estos dos divs son mutuamente excluyentes (solo uno visible).
+
+                 RUTA LÓGICA (automática tras cargar las noticias):
+                   1. [app.js] Tras cargarNoticias(), el .then() llama a comprobarSesion().
+                   2. [app.js] comprobarSesion() hace:
+                          fetch GET '../api/sesion'
+                   3. [Tomcat] La URL '/api/sesion' coincide con:
+                          SesionServlet.java → método doGet()
+                   4. [SesionServlet] Llama a request.getSession(false).
+                          Si hay sesión activa con atributo "adminLogueado" → logueado = true.
+                          Si no → logueado = false.
+                   5. [SesionServlet] Responde con JSON: {"logueado": true/false, "usuario": "..."}
+                   6. [app.js] El .then() recibe el JSON y llama a actualizarUI(data.logueado).
+                   7. [app.js] actualizarUI():
+                          Si logueado=true  → muestra #controles-admin, oculta #controles-publicos.
+                          Si logueado=false → muestra #controles-publicos, oculta #controles-admin.
+            ======================================================= -->
             <div id="controles-publicos">
+                <!-- ===== BOTÓN "Admin" (abre el modal de login) ===========
+                     RUTA LÓGICA:
+                       1. [index.html] Este botón tiene id="btn-abrir-login".
+                       2. [app.js] DOMContentLoaded asigna:
+                              document.getElementById('btn-abrir-login').onclick
+                              = function() { abrirModal('modal-login'); }
+                       3. [app.js] abrirModal('modal-login') cambia el CSS:
+                              document.getElementById('modal-login').style.display = 'flex'
+                          → el modal aparece en pantalla.
+                       ⚠️ Este botón NO contacta al servidor. Solo muestra el modal.
+                ========================================================= -->
                 <button id="btn-abrir-login" class="btn-texto-azul">Admin</button>
             </div>
 
-            <!-- Zona de admin (visible SOLO cuando hay admin logueado):
-                 muestra un enlace al panel de administración.
-                 Empieza oculto (display:none) y app.js lo muestra si hay sesión. -->
+            <!-- Visible solo si hay admin logueado (app.js lo controla). -->
             <div id="controles-admin" style="display:none;">
                 <a href="admin.html" class="btn-texto-azul">Panel de admin</a>
             </div>
         </div>
     </footer>
 
-    <!-- ===== MODAL DE LOGIN ======================================
-         Ventana emergente (modal) para que el administrador inicie sesión.
-         Empieza oculta (display:none). Se muestra al pulsar "Admin".
-         La clase "modal" crea el fondo oscuro semitransparente.
+    <!-- ===== MODAL DE LOGIN =====================================
+         Empieza OCULTO. Se muestra al pulsar el botón "Admin".
+
+         RUTA LÓGICA al enviar el formulario (botón "Entrar"):
+           1. [index.html] El formulario tiene id="form-login".
+           2. [app.js] DOMContentLoaded asigna:
+                  document.getElementById('form-login').onsubmit = iniciarSesion
+           3. [app.js] iniciarSesion(e):
+                  e.preventDefault()  → cancela el envío HTML por defecto.
+                  Lee los campos:
+                    usuario = document.getElementById('usuario').value
+                    password = document.getElementById('password').value
+                  Hace:
+                    fetch POST '../api/login'
+                    body: 'usuario=X&password=Y'
+           4. [Tomcat] La URL '/api/login' coincide con:
+                  LoginServlet.java → método doPost()
+           5. [LoginServlet] Lee los parámetros "usuario" y "password".
+                  Crea LoginDAO y llama a autenticar(usuario, password).
+           6. [LoginDAO] Ejecuta en MySQL:
+                  SELECT * FROM administradores WHERE usuario=? AND password_hash=?
+           7. [MySQL] Devuelve la fila si existe, vacío si no.
+           8. [LoginServlet]:
+                  Si encontró el admin → crea sesión HTTP:
+                    session.setAttribute("adminLogueado", true)
+                    Responde HTTP 200 (res.ok = true en JS)
+                  Si no → responde HTTP 401 (res.ok = false en JS)
+           9. [app.js] El .then() comprueba res.ok:
+                  Si true → window.location.href = 'admin.html' (redirige)
+                  Si false → alert('Usuario o contraseña incorrectos')
+
+         ⚠️ BOTÓN CERRAR:
+           1. [index.html] Botón con id="btn-cerrar-login".
+           2. [app.js] DOMContentLoaded asigna:
+                  document.getElementById('btn-cerrar-login').onclick
+                  = function() { cerrarModal('modal-login'); }
+           3. [app.js] cerrarModal(): style.display = 'none' → desaparece.
     ============================================================= -->
     <div id="modal-login" class="modal" style="display:none;">
         <div class="modal-contenido">
-
-            <!-- Botón "×" para cerrar el modal sin iniciar sesión. -->
             <button class="cerrar" id="btn-cerrar-login">&times;</button>
-
             <h2>Acceso administrador</h2>
-
-            <!-- Formulario de login. app.js intercepta el "submit" para
-                 enviarlo de forma asíncrona (sin recargar la página). -->
             <form id="form-login">
-
-                <!-- Campo de texto para el nombre de usuario. -->
                 <div class="grupo-input">
-                    <!-- label for="usuario" asocia la etiqueta con el input de id="usuario".
-                         Esto permite hacer clic en el texto para enfocar el campo. -->
                     <label for="usuario">Usuario:</label>
                     <input type="text" id="usuario" name="usuario" required>
                 </div>
-
-                <!-- Campo de contraseña. type="password" enmascara el texto escrito. -->
                 <div class="grupo-input">
                     <label for="password">Contraseña:</label>
                     <input type="password" id="password" name="password" required>
                 </div>
-
-                <!-- Botón de envío. Al pulsarlo, dispara el evento "submit" del formulario. -->
                 <button type="submit" class="btn-azul btn-grande">Entrar</button>
             </form>
         </div>
     </div>
 
     <!-- ===== JAVASCRIPT ==========================================
-         Se carga al final del body para que el HTML ya esté cargado
-         cuando el script intente acceder a los elementos del DOM.
+         Este <script> le dice al navegador que descargue y ejecute app.js.
+         Está al FINAL del body para que cuando se ejecute, todos los
+         elementos HTML de arriba ya existan en el DOM.
+         Si estuviera en el <head>, document.getElementById(...) no
+         encontraría nada porque el HTML aún no se habría leído.
     ============================================================= -->
     <script src="js/app.js"></script>
 </body>
