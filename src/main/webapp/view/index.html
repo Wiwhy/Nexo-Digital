@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <!--
     ============================================================
     CÓMO SE CONECTA ESTE ARCHIVO CON EL RESTO DEL PROYECTO
@@ -105,16 +105,16 @@
             <div id="controles-publicos">
                 <!-- ===== BOTÓN "Admin" (abre el modal de login) ===========
                      RUTA LÓGICA:
-                       1. [index.html] Este botón tiene id="btn-abrir-login".
+                       1. [index.html] Este botón tiene id="boton-abrir-login".
                        2. [app.js] DOMContentLoaded asigna:
-                              document.getElementById('btn-abrir-login').onclick
+                              document.getElementById('boton-abrir-login').onclick
                               = function() { abrirModal('modal-login'); }
                        3. [app.js] abrirModal('modal-login') cambia el CSS:
                               document.getElementById('modal-login').style.display = 'flex'
                           → el modal aparece en pantalla.
                        ⚠️ Este botón NO contacta al servidor. Solo muestra el modal.
                 ========================================================= -->
-                <button id="btn-abrir-login" class="btn-texto-azul">Admin</button>
+                <button id="boton-abrir-login" class="btn-texto-azul">Admin</button>
             </div>
 
             <!-- Visible solo si hay admin logueado (app.js lo controla). -->
@@ -156,15 +156,15 @@
                   Si false → alert('Usuario o contraseña incorrectos')
 
          ⚠️ BOTÓN CERRAR:
-           1. [index.html] Botón con id="btn-cerrar-login".
+           1. [index.html] Botón con id="boton-cerrar-login".
            2. [app.js] DOMContentLoaded asigna:
-                  document.getElementById('btn-cerrar-login').onclick
+                  document.getElementById('boton-cerrar-login').onclick
                   = function() { cerrarModal('modal-login'); }
            3. [app.js] cerrarModal(): style.display = 'none' → desaparece.
     ============================================================= -->
     <div id="modal-login" class="modal" style="display:none;">
         <div class="modal-contenido">
-            <button class="cerrar" id="btn-cerrar-login">&times;</button>
+            <button class="cerrar" id="boton-cerrar-login">&times;</button>
             <h2>Acceso administrador</h2>
             <form id="form-login">
                 <div class="grupo-input">

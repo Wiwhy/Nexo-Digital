@@ -16,16 +16,19 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Carga los datos de la noticia cuyo ID viene en la URL.
     cargarNoticiaIndividual();
+    
     // Comprueba si hay admin logueado (para mostrar/ocultar controles de admin).
     comprobarSesion();
 
     // Eventos del modal de login (igual que en app.js).
-    document.getElementById('btn-abrir-login').onclick = function() {
+    document.getElementById('boton-abrir-login').onclick = function() {
         abrirModal('modal-login');
     };
-    document.getElementById('btn-cerrar-login').onclick = function() {
+    
+    document.getElementById('boton-cerrar-login').onclick = function() {
         cerrarModal('modal-login');
     };
+    
     document.getElementById('form-login').onsubmit = iniciarSesion;
 });
 
@@ -42,90 +45,82 @@ document.addEventListener('DOMContentLoaded', function() {
    -------------------------------------------------------------------------- */
 function cargarNoticiaIndividual() {
     // URLSearchParams analiza los parámetros de la URL de la página actual.
-    // window.location.search devuelve la parte después del "?".
-    // Ejemplo: si la URL es "noticia.html?id=5" → window.location.search es "?id=5"
-    var params  = new URLSearchParams(window.location.search);
+    var parametrosDeLaUrl = new URLSearchParams(window.location.search);
 
     // params.get('id') extrae el valor del parámetro "id".
-    // Resultado: "5" (String) o null si no hay parámetro "id" en la URL.
-    var idParam = params.get('id');
+    var idDeLaNoticiaEnUrl = parametrosDeLaUrl.get('id');
 
     // Referencia al elemento del título para poder modificarlo.
-    var tituloEl = document.getElementById('noticia-titulo');
+    var elementoHtmlTitulo = document.getElementById('noticia-titulo');
 
     // Si el elemento no existe en el HTML, salimos (prevención de errores).
-    if (!tituloEl) return;
+    if (!elementoHtmlTitulo) return;
 
     // Si no hay ID en la URL, no sabemos qué noticia cargar.
-    if (!idParam) {
-        tituloEl.textContent = 'Noticia no encontrada';
+    if (!idDeLaNoticiaEnUrl) {
+        elementoHtmlTitulo.textContent = 'Noticia no encontrada';
         return;
     }
 
-    // Hacemos GET al Servlet ObtenerNoticiaServlet con el ID como parámetro en la URL.
-    // Ejemplo de URL resultante: "../api/noticias/obtener?id=5"
-    fetch('../api/noticias/obtener?id=' + idParam)
+    // Hacemos GET al Servlet con el ID como parámetro en la URL.
+    fetch('../api/noticias/obtener?id=' + idDeLaNoticiaEnUrl)
         // Primer .then(): comprobamos el código HTTP y parseamos el JSON.
-        .then(function(res) {
-            // Si el servidor devuelve un error (404, 500...) → res.ok es false.
-            // En ese caso lanzamos un Error para que lo capture el .catch().
-            if (!res.ok) {
-                throw new Error('HTTP ' + res.status);
+        .then(function(respuestaServidor) {
+            // Si el servidor devuelve un error (404, 500...) lanzamos un Error.
+            if (!respuestaServidor.ok) {
+                throw new Error('HTTP ' + respuestaServidor.status);
             }
-            // res.json() devuelve una Promise → la retornamos para encadenar el siguiente .then().
-            return res.json();
+            // Retornamos el JSON parseado.
+            return respuestaServidor.json();
         })
         // Segundo .then(): recibimos el objeto noticia y rellenamos el HTML.
-        .then(function(n) {
+        .then(function(noticiaRecibida) {
             // TÍTULO:
-            // textContent es más seguro que innerHTML para datos del usuario
-            // porque no interpreta etiquetas HTML (evita ataques XSS).
-            document.getElementById('noticia-titulo').textContent = n.titulo || 'Sin título';
+            document.getElementById('noticia-titulo').textContent = noticiaRecibida.titulo || 'Sin título';
 
             // METADATOS (autor y fecha):
-            var metaEl    = document.getElementById('noticia-meta');
-            // Si n.autor está vacío o es null, usamos 'Autor desconocido'.
-            var autorTexto = n.autor ? n.autor : 'Autor desconocido';
+            var elementoHtmlMeta = document.getElementById('noticia-meta');
+            
+            // Si autor está vacío o es null, usamos 'Autor desconocido'.
+            var textoAutor = noticiaRecibida.autor ? noticiaRecibida.autor : 'Autor desconocido';
+            
             // Si hay fecha, la formateamos a texto legible en español.
-            // new Date() convierte el String de fecha a objeto Date de JavaScript.
-            // toLocaleDateString('es-ES', {...}) → "19 de mayo de 2024"
-            var fechaTexto = n.fechaPublicacion
-                ? new Date(n.fechaPublicacion).toLocaleDateString('es-ES', {
+            var textoFecha = noticiaRecibida.fechaPublicacion
+                ? new Date(noticiaRecibida.fechaPublicacion).toLocaleDateString('es-ES', {
                     year: 'numeric', month: 'long', day: 'numeric'
                   })
                 : '';
-            // Insertamos autor y fecha como dos <span> dentro del elemento meta.
-            metaEl.innerHTML = '<span>' + autorTexto + '</span><span>' + fechaTexto + '</span>';
+                
+            // Insertamos autor y fecha como dos <span>.
+            elementoHtmlMeta.innerHTML = '<span>' + textoAutor + '</span><span>' + textoFecha + '</span>';
 
             // IMAGEN:
-            var imgElement = document.getElementById('noticia-imagen');
-            if (n.nombreImagen && n.nombreImagen !== 'null' && n.nombreImagen !== '') {
+            var elementoHtmlImagen = document.getElementById('noticia-imagen');
+            if (noticiaRecibida.nombreImagen && noticiaRecibida.nombreImagen !== 'null' && noticiaRecibida.nombreImagen !== '') {
                 // Si tiene imagen → asignamos la URL y la mostramos.
-                imgElement.src           = '../uploads/' + n.nombreImagen;
-                imgElement.style.display = 'block';
+                elementoHtmlImagen.src = '../uploads/' + noticiaRecibida.nombreImagen;
+                elementoHtmlImagen.style.display = 'block';
             } else {
                 // Sin imagen → ocultamos el elemento <img> completamente.
-                imgElement.style.display = 'none';
+                elementoHtmlImagen.style.display = 'none';
             }
 
             // CONTENIDO:
-            if (n.contenido) {
+            if (noticiaRecibida.contenido) {
                 // El contenido puede contener saltos de línea (\n).
                 // split('\n') divide el texto en un array de párrafos.
                 // map() envuelve cada párrafo en etiquetas <p>.
-                // join('') une el array de vuelta a un String sin separadores.
+                // join('') une el array de vuelta a un String.
                 document.getElementById('noticia-cuerpo').innerHTML =
-                    n.contenido.split('\n').map(function(p) {
-                        return '<p>' + p + '</p>';
+                    noticiaRecibida.contenido.split('\n').map(function(parrafoIndividual) {
+                        return '<p>' + parrafoIndividual + '</p>';
                     }).join('');
             } else {
                 document.getElementById('noticia-cuerpo').innerHTML = '<p>Sin contenido.</p>';
             }
         })
-        // .catch(): captura dos tipos de errores:
-        //   A) Error de red (fetch() falla por sin conexión o servidor caído).
-        //   B) El throw new Error() que lanzamos manualmente si res.ok era false.
-        .catch(function() {
+        // .catch(): captura errores de red o errores lanzados manualmente.
+        .catch(function(errorDetectado) {
             document.getElementById('noticia-titulo').textContent = 'Error al cargar la noticia';
         });
 }
@@ -134,38 +129,41 @@ function cargarNoticiaIndividual() {
 /* ==========================================================================
    FUNCIONES DE MODAL
    ========================================================================== */
-function abrirModal(id) { document.getElementById(id).style.display = 'flex'; }
-function cerrarModal(id) { document.getElementById(id).style.display = 'none'; }
+function abrirModal(idDelModal) { 
+    document.getElementById(idDelModal).style.display = 'flex'; 
+}
+
+function cerrarModal(idDelModal) { 
+    document.getElementById(idDelModal).style.display = 'none'; 
+}
 
 
 /* ==========================================================================
-   LOGIN (igual que en app.js, necesario aquí porque esta página
-   también tiene modal de login en el header)
+   LOGIN (igual que en app.js)
    ========================================================================== */
-function iniciarSesion(e) {
-    // Cancelamos el comportamiento por defecto del formulario (recargar la página).
-    e.preventDefault();
+function iniciarSesion(eventoSubmit) {
+    // Cancelamos el recargo de página.
+    eventoSubmit.preventDefault();
 
-    var usuario  = document.getElementById('usuario').value;
-    var password = document.getElementById('password').value;
+    var nombreUsuario = document.getElementById('usuario').value;
+    var contrasenaUsuario = document.getElementById('password').value;
 
     // POST /api/login con usuario y contraseña en el body.
     fetch('../api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'usuario=' + encodeURIComponent(usuario) + '&password=' + encodeURIComponent(password)
+        body: 'usuario=' + encodeURIComponent(nombreUsuario) + '&password=' + encodeURIComponent(contrasenaUsuario)
     })
-        // .then(): si el servidor devuelve 200 (ok) → redirigimos a admin.html.
-        //         si devuelve 401 → avisamos al usuario.
-        .then(function(res) {
-            if (res.ok) {
+        // .then(): gestiona la respuesta.
+        .then(function(respuestaServidor) {
+            if (respuestaServidor.ok) {
                 window.location.href = 'admin.html';
             } else {
                 alert('Usuario o contraseña incorrectos');
             }
         })
-        // .catch(): error de red (sin conexión, servidor caído).
-        .catch(function() {
+        // .catch(): error de red.
+        .catch(function(errorDeRed) {
             alert('Error de conexión con el servidor');
         });
 }
@@ -177,40 +175,32 @@ function iniciarSesion(e) {
 
 /* --------------------------------------------------------------------------
    FUNCIÓN: comprobarSesion
-
-   Pregunta al servidor si hay admin logueado y adapta la interfaz.
    -------------------------------------------------------------------------- */
 function comprobarSesion() {
     fetch('../api/sesion')
-        // Primer .then(): parseamos el JSON.
-        .then(function(res) {
-            return res.json();
+        .then(function(respuestaServidor) {
+            return respuestaServidor.json();
         })
-        // Segundo .then(): actualizamos la UI con el estado de sesión.
-        .then(function(data) {
-            actualizarUI(data.logueado);
+        .then(function(datosSesion) {
+            actualizarInterfazUsuario(datosSesion.logueado);
         })
-        // .catch(): si hay error, asumimos que no hay sesión.
-        .catch(function() {
-            actualizarUI(false);
+        .catch(function(errorDetectado) {
+            actualizarInterfazUsuario(false);
         });
 }
 
 /* --------------------------------------------------------------------------
-   FUNCIÓN: actualizarUI
-
-   Muestra u oculta los controles de navegación según si hay admin logueado.
+   FUNCIÓN: actualizarInterfazUsuario
    -------------------------------------------------------------------------- */
-function actualizarUI(logueado) {
-    var controlesAdmin    = document.getElementById('controles-admin');
-    var controlesPublicos = document.getElementById('controles-publicos');
+function actualizarInterfazUsuario(estaLogueado) {
+    var controlesDelAdministrador = document.getElementById('controles-admin');
+    var controlesDelPublico = document.getElementById('controles-publicos');
 
-    if (logueado) {
-        controlesAdmin.style.display    = 'block';
-        controlesPublicos.style.display = 'none';
+    if (estaLogueado) {
+        controlesDelAdministrador.style.display = 'block';
+        controlesDelPublico.style.display = 'none';
     } else {
-        controlesAdmin.style.display    = 'none';
-        controlesPublicos.style.display = 'block';
+        controlesDelAdministrador.style.display = 'none';
+        controlesDelPublico.style.display = 'block';
     }
 }
-

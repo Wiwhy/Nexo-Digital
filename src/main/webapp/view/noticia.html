@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <!--
     ============================================================
     CÓMO SE CONECTA ESTE ARCHIVO CON EL RESTO DEL PROYECTO
@@ -139,14 +139,14 @@
             <div id="controles-publicos">
                 <!-- ===== BOTÓN "Admin" ================================
                      RUTA LÓGICA:
-                       1. [noticia.html] Botón con id="btn-abrir-login".
+                       1. [noticia.html] Botón con id="boton-abrir-login".
                        2. [noticia.js] DOMContentLoaded asigna:
-                              document.getElementById('btn-abrir-login').onclick
+                              document.getElementById('boton-abrir-login').onclick
                               = function() { abrirModal('modal-login'); }
                        3. abrirModal(): style.display = 'flex' → modal visible.
                        ⚠️ No contacta al servidor. Solo muestra el modal.
                 ========================================================= -->
-                <button id="btn-abrir-login" class="btn-texto-azul">Admin</button>
+                <button id="boton-abrir-login" class="btn-texto-azul">Admin</button>
             </div>
 
             <!-- Visible solo si hay admin logueado. -->
@@ -184,13 +184,13 @@
                   Si false → alert('Usuario o contraseña incorrectos')
 
          BOTÓN CERRAR:
-           1. [noticia.html] id="btn-cerrar-login".
+           1. [noticia.html] id="boton-cerrar-login".
            2. [noticia.js] onclick → cerrarModal('modal-login')
               → style.display = 'none'.
     ============================================================= -->
     <div id="modal-login" class="modal" style="display:none;">
         <div class="modal-contenido">
-            <button class="cerrar" id="btn-cerrar-login">&times;</button>
+            <button class="cerrar" id="boton-cerrar-login">&times;</button>
             <h2>Acceso administrador</h2>
             <form id="form-login">
                 <div class="grupo-input">

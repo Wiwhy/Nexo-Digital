@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <!--
     ============================================================
     CÓMO SE CONECTA ESTE ARCHIVO CON EL RESTO DEL PROYECTO
@@ -61,9 +61,9 @@
 
                 <!-- ===== BOTÓN "Crear" ================================
                      RUTA LÓGICA:
-                       1. [admin.html] Botón con id="btn-nueva-noticia".
+                       1. [admin.html] Botón con id="boton-nueva-noticia".
                        2. [admin.js] DOMContentLoaded asigna:
-                              document.getElementById('btn-nueva-noticia').onclick
+                              document.getElementById('boton-nueva-noticia').onclick
                               = function() { abrirModalNoticia(); }
                               (sin argumento → modo CREACIÓN)
                        3. [admin.js] abrirModalNoticia(null):
@@ -77,7 +77,7 @@
                           → Ver el comentario del <form id="form-noticia"> abajo.
                        ⚠️ Este botón NO contacta al servidor. Solo muestra el modal.
                 ========================================================= -->
-                <button class="btn-azul btn-pequeno" id="btn-nueva-noticia">Crear</button>
+                <button class="btn-azul btn-pequeno" id="boton-nueva-noticia">Crear</button>
             </div>
 
             <!-- ===== LISTA DE NOTICIAS ============================
@@ -124,9 +124,9 @@
 
             <!-- ===== BOTÓN "Cerrar Sesión" ===========================
                  RUTA LÓGICA:
-                   1. [admin.html] Enlace con id="btn-logout".
+                   1. [admin.html] Enlace con id="boton-cerrar-sesion".
                    2. [admin.js] DOMContentLoaded asigna:
-                          document.getElementById('btn-logout').onclick = cerrarSesion
+                          document.getElementById('boton-cerrar-sesion').onclick = cerrarSesion
                    3. [admin.js] cerrarSesion(e):
                           e.preventDefault() → cancela la navegación del enlace.
                           Hace:
@@ -141,7 +141,7 @@
                    6. [admin.js] El .then() recibe la respuesta y hace:
                           window.location.href = 'index.html' → redirige al portal.
             ========================================================= -->
-            <a href="#" id="btn-logout" class="btn-texto-azul">Cerrar Sesión</a>
+            <a href="#" id="boton-cerrar-sesion" class="btn-texto-azul">Cerrar Sesión</a>
         </div>
     </footer>
 
@@ -196,7 +196,7 @@
            7. Respuesta y refresco igual que en Creación.
 
          RUTA LÓGICA al pulsar "Eliminar":
-           1. [admin.js] El onclick de #btn-eliminar-modal llama a:
+           1. [admin.js] El onclick de #boton-eliminar-noticia llama a:
                   eliminarNoticia(noticiaId)
            2. [admin.js] eliminarNoticia(id):
                   confirm('¿Seguro?') → si el usuario cancela, se detiene aquí.
@@ -212,15 +212,15 @@
            6. Responde éxito. admin.js cierra modal y recarga lista.
 
          BOTÓN CERRAR DEL MODAL:
-           1. [admin.html] Botón con id="btn-cerrar-modal-noticia".
+           1. [admin.html] Botón con id="boton-cerrar-modal-noticia".
            2. [admin.js] DOMContentLoaded asigna:
-                  document.getElementById('btn-cerrar-modal-noticia').onclick
+                  document.getElementById('boton-cerrar-modal-noticia').onclick
                   = function() { cerrarModal('modal-noticia'); }
            3. cerrarModal(): style.display = 'none' → modal desaparece.
     ============================================================= -->
     <div id="modal-noticia" class="modal" style="display:none;">
         <div class="modal-contenido">
-            <button class="cerrar" id="btn-cerrar-modal-noticia">&times;</button>
+            <button class="cerrar" id="boton-cerrar-modal-noticia">&times;</button>
 
             <!-- admin.js cambia este texto entre "Crear noticia" y "Editar noticia". -->
             <h2 id="modal-noticia-titulo">Editar noticia</h2>
@@ -261,11 +261,11 @@
                 <div class="acciones-modal-flex">
                     <!-- Botón submit: dispara el evento "submit" del formulario.
                          admin.js lo captura con onsubmit = guardarNoticia. -->
-                    <button type="submit" class="btn-azul btn-grande" id="btn-guardar-modal">Guardar</button>
+                    <button type="submit" class="btn-azul btn-grande" id="boton-guardar-noticia">Guardar</button>
 
                     <!-- Solo visible en modo edición.
                          admin.js lo oculta (display:none) en modo creación. -->
-                    <button type="button" class="btn-azul btn-grande" id="btn-eliminar-modal">Eliminar</button>
+                    <button type="button" class="btn-azul btn-grande" id="boton-eliminar-noticia">Eliminar</button>
                 </div>
             </form>
         </div>
@@ -275,7 +275,7 @@
          admin.js se carga aquí, AL FINAL del body.
          Razón: si estuviera en el <head>, el script se ejecutaría
          antes de que el HTML estuviera construido, y llamadas como
-         document.getElementById('btn-nueva-noticia') devolverían null
+         document.getElementById('boton-nueva-noticia') devolverían null
          porque ese elemento aún no existiría en el DOM.
     ============================================================= -->
     <script src="js/admin.js"></script>
