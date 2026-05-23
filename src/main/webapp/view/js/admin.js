@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    admin.js — JAVASCRIPT DEL PANEL DE ADMINISTRACIÓN (admin.html)
 
    Este archivo controla la página de administración.
@@ -19,7 +19,7 @@
    ========================================================================== */
 
 // Cuando el DOM esté listo, ejecutamos la inicialización.
-document.addEventListener('DOMContentLoaded', function() {
+
 
     // LO PRIMERO: verificamos si hay sesión de admin.
     // Si no la hay, redirigimos a index.html.
@@ -41,9 +41,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Botón "Cerrar sesión" → llama a cerrarSesion().
     document.getElementById('boton-cerrar-sesion').onclick = cerrarSesion;
-});
-
-
 /* ==========================================================================
    VERIFICACIÓN DE SESIÓN DE ADMIN
    ========================================================================== */

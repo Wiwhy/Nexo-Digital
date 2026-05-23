@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    noticia.js — JAVASCRIPT DE LA PÁGINA DE DETALLE DE NOTICIA (noticia.html)
 
    Este archivo controla la página que muestra una noticia completa.
@@ -13,7 +13,7 @@
 /* ==========================================================================
    INICIALIZACIÓN AL CARGAR LA PÁGINA
    ========================================================================== */
-document.addEventListener('DOMContentLoaded', function() {
+
     // Carga los datos de la noticia cuyo ID viene en la URL.
     cargarNoticiaIndividual();
     
@@ -21,7 +21,8 @@ document.addEventListener('DOMContentLoaded', function() {
     comprobarSesion();
 
     // Eventos del modal de login (igual que en app.js).
-    document.getElementById('boton-abrir-login').onclick = function() {
+    document.getElementById('boton-abrir-login').onclick = function(evento) {
+        evento.preventDefault();
         abrirModal('modal-login');
     };
     
@@ -30,9 +31,6 @@ document.addEventListener('DOMContentLoaded', function() {
     };
     
     document.getElementById('form-login').onsubmit = iniciarSesion;
-});
-
-
 /* ==========================================================================
    CARGA DE LA NOTICIA INDIVIDUAL
    ========================================================================== */
@@ -204,3 +202,5 @@ function actualizarInterfazUsuario(estaLogueado) {
         controlesDelPublico.style.display = 'block';
     }
 }
+
+

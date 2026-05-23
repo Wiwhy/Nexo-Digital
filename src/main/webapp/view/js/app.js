@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    app.js — JAVASCRIPT DE LA PÁGINA PÚBLICA (index.html)
 
    Este archivo controla la página principal del portal de noticias.
@@ -16,7 +16,7 @@
    y construyó el DOM. Es el momento correcto para añadir listeners y
    manipular elementos, porque antes podrían no existir todavía.
    ========================================================================== */
-document.addEventListener('DOMContentLoaded', function() {
+
 
     // Primero cargamos las noticias. Cuando terminen, comprobamos la sesión
     // para mostrar u ocultar los controles de admin en el header.
@@ -27,7 +27,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Al hacer clic en "Iniciar sesión" → abrimos el modal de login.
-    document.getElementById('boton-abrir-login').onclick = function() {
+    document.getElementById('boton-abrir-login').onclick = function(evento) {
+        evento.preventDefault();
         abrirModal('modal-login');
     };
 
@@ -38,9 +39,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Al enviar el formulario de login → llamamos a iniciarSesion().
     document.getElementById('form-login').onsubmit = iniciarSesion;
-});
-
-
 /* ==========================================================================
    PETICIONES AL BACKEND (SERVLETS JAVA) Y PINTADO DEL DOM
    ========================================================================== */
@@ -215,3 +213,5 @@ function actualizarInterfazUsuario(estaLogueado) {
         controlesDelPublico.style.display = 'block';
     }
 }
+
+
