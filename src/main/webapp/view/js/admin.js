@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    admin.js — JAVASCRIPT DEL PANEL DE ADMINISTRACIÓN (admin.html)
 
    Este archivo controla la página de administración.
@@ -39,6 +39,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Botón "Cerrar sesión" → llama a cerrarSesion().
     document.getElementById('boton-cerrar-sesion').onclick = cerrarSesion;
+
+    // Actualiza el texto del nombre de archivo al seleccionar una imagen.
+    document.getElementById('campo-archivo-imagen').addEventListener('change', function() {
+        var elementoTextoArchivo = document.getElementById('texto-nombre-archivo');
+        if (this.files && this.files.length > 0) {
+            elementoTextoArchivo.textContent = this.files[0].name;
+        } else {
+            elementoTextoArchivo.textContent = 'Ningún archivo seleccionado';
+        }
+    });
 });
 
 
@@ -171,7 +181,7 @@ function renderTablaNoticias() {
         // .replace(/'/g, "&apos;") reemplaza comillas simples para no romper el HTML.
         elementoHtmlFila.innerHTML =
             '<span class="titulo-lista-admin">' + noticiaActual.titulo + '</span>' +
-            '<button class="btn-azul boton-pequeno" onclick=\'abrirModalNoticia(' +
+            '<button class="btn-azul boton-grande" onclick=\'abrirModalNoticia(' +
             JSON.stringify(noticiaActual).replace(/'/g, '&apos;') +
             ')\'>Editar</button>';
 
@@ -371,17 +381,5 @@ function cerrarModal(idDelModal) {
 
    El input de tipo "file" tiene apariencia nativa poco personalizable.
    Mostramos el nombre del archivo seleccionado en un <span> propio.
+   (El listener se registra dentro de DOMContentLoaded, al inicio del archivo.)
    ========================================================================== */
-document.getElementById('campo-archivo-imagen').addEventListener('change', function() {
-    var elementoTextoArchivo = document.getElementById('texto-nombre-archivo');
-
-    // "this" hace referencia al input de archivo que disparó el evento.
-    // "this.files" es la lista de archivos seleccionados (FileList).
-    if (this.files && this.files.length > 0) {
-        // El usuario seleccionó al menos un archivo → mostramos el nombre del primero.
-        elementoTextoArchivo.textContent = this.files[0].name;
-    } else {
-        // No hay archivos seleccionados → mostramos el texto por defecto.
-        elementoTextoArchivo.textContent = 'Ningún archivo seleccionado';
-    }
-});
