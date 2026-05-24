@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    admin.css — HOJA DE ESTILOS DEL PANEL DE ADMINISTRACIÓN
    Se carga SOLO en admin.html, complementando a estilos.css.
    Contiene estilos específicos de: la tarjeta del panel,
@@ -45,6 +45,12 @@
     font-size: 2rem;
     margin: 0 !important;
     line-height: 1 !important;
+}
+
+/* El botón "Crear" hereda margin: 0 auto de .boton-grande (estilos.css),
+   lo que lo centraría. Aquí lo reseteamos para que el flex lo empuje a la derecha. */
+.encabezado-admin .boton-grande {
+    margin: 0 !important;
 }
 
 
