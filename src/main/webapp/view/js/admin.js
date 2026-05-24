@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    admin.js — JAVASCRIPT DEL PANEL DE ADMINISTRACIÓN (admin.html)
 
    Este archivo controla la página de administración.
@@ -17,12 +17,9 @@
 /* ==========================================================================
    INICIALIZACIÓN AL CARGAR LA PÁGINA
    ========================================================================== */
+document.addEventListener('DOMContentLoaded', function() {
 
-// Cuando el DOM esté listo, ejecutamos la inicialización.
-
-
-    document.addEventListener('DOMContentLoaded', function() {
-// LO PRIMERO: verificamos si hay sesión de admin.
+    // LO PRIMERO: verificamos si hay sesión de admin.
     // Si no la hay, redirigimos a index.html.
     comprobarSesionAdmin();
 
@@ -44,6 +41,7 @@
     document.getElementById('boton-cerrar-sesion').onclick = cerrarSesion;
 });
 
+
 /* ==========================================================================
    VERIFICACIÓN DE SESIÓN DE ADMIN
    ========================================================================== */
@@ -55,8 +53,11 @@
    Si no hay → redirige al inicio. Si hay → carga las noticias.
    -------------------------------------------------------------------------- */
 function comprobarSesionAdmin() {
-    // GET /api/sesion → SesionServlet devuelve {"logueado": true/false, "usuario": "..."}
-    fetch('../api/sesion')
+    // method: 'GET' porque solo consultamos si hay sesión, no modificamos nada.
+    // El Servlet SesionServlet responde con: {"logueado": true/false, "usuario": "..."}
+    fetch('../api/sesion', {
+        method: 'GET'
+    })
         // Primer .then(): parseamos el JSON de la respuesta.
         .then(function(respuestaServidor) {
             return respuestaServidor.json();
@@ -74,6 +75,7 @@ function comprobarSesionAdmin() {
         })
         // .catch(): si hay error de red → redirigimos al inicio por seguridad.
         .catch(function(errorDetectado) {
+            console.error('Error al comprobar sesión de admin:', errorDetectado);
             window.location.href = 'index.html';
         });
 }
@@ -93,7 +95,8 @@ function cerrarSesion(eventoClick) {
     // Evita que el enlace/botón haga su acción por defecto (navegar o recargar).
     eventoClick.preventDefault();
 
-    // POST /api/sesion con body "action=logout" → SesionServlet invalida la sesión.
+    // method: 'POST' porque estamos modificando el estado del servidor (destruyendo la sesión).
+    // body: "action=logout" le indica al SesionServlet que queremos cerrar sesión.
     fetch('../api/sesion', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -105,6 +108,7 @@ function cerrarSesion(eventoClick) {
         })
         // .catch(): si hay error de red, redirigimos igualmente al inicio.
         .catch(function(errorDetectado) {
+            console.error('Error al cerrar sesión:', errorDetectado);
             window.location.href = 'index.html';
         });
 }
@@ -115,6 +119,7 @@ function cerrarSesion(eventoClick) {
    ========================================================================== */
 
 // Variable global donde almacenamos la lista de noticias cargadas.
+// Es global para que renderTablaNoticias() pueda acceder a ella desde fuera de cargarNoticiasAdmin().
 var listaDeNoticiasGlobales = [];
 
 /* --------------------------------------------------------------------------
@@ -124,14 +129,17 @@ var listaDeNoticiasGlobales = [];
    global y llama a renderTablaNoticias() para mostrarlas en el HTML.
    -------------------------------------------------------------------------- */
 function cargarNoticiasAdmin() {
-    fetch('../api/noticias/listar')
+    // method: 'GET' porque solo leemos datos de la base de datos.
+    fetch('../api/noticias/listar', {
+        method: 'GET'
+    })
         // Primer .then(): parseamos el JSON de la respuesta.
         .then(function(respuestaServidor) {
             return respuestaServidor.json();
         })
         // Segundo .then(): guardamos el array en la variable global y renderizamos.
         .then(function(listaDeNoticias) {
-            // Guardamos en la variable global para que editarNoticia() pueda acceder.
+            // Guardamos en la variable global para que abrirModalNoticia() pueda acceder.
             listaDeNoticiasGlobales = listaDeNoticias;
             // Dibujamos la lista en el HTML.
             renderTablaNoticias();
@@ -181,17 +189,17 @@ function renderTablaNoticias() {
 
    Abre el modal del formulario.
    Si recibe un objeto noticia → modo EDICIÓN (rellena el formulario).
-   Si no recibe nada (noticia = null) → modo CREACIÓN (formulario en blanco).
+   Si no recibe nada (objetoNoticia = null) → modo CREACIÓN (formulario en blanco).
    -------------------------------------------------------------------------- */
 function abrirModalNoticia(objetoNoticia) {
     // Si no se pasa argumento, objetoNoticia será undefined → lo tratamos como null.
     objetoNoticia = objetoNoticia || null;
 
-    var formularioHtml       = document.getElementById('form-noticia');
-    var botonEliminarHtml = document.getElementById('boton-eliminar-noticia');
-    var botonGuardarHtml  = document.getElementById('boton-guardar-noticia');
+    var formularioHtml      = document.getElementById('form-noticia');
+    var botonEliminarHtml   = document.getElementById('boton-eliminar-noticia');
+    var botonGuardarHtml    = document.getElementById('boton-guardar-noticia');
 
-    // Limpiamos todos los campos del formulario.
+    // Limpiamos todos los campos del formulario antes de rellenarlos.
     formularioHtml.reset();
 
     if (objetoNoticia) {
@@ -200,17 +208,18 @@ function abrirModalNoticia(objetoNoticia) {
 
         // Campo oculto con el ID de la noticia (se envía con el formulario).
         // El Servlet lo usa para saber qué fila de la BD actualizar.
-        document.getElementById('noticia-id').value = objetoNoticia.id;
-
-        document.getElementById('noticia-titulo-input').value  = objetoNoticia.titulo;
-        document.getElementById('noticia-autor-input').value   = objetoNoticia.autor || '';
-        document.getElementById('noticia-contenido').value     = objetoNoticia.contenido;
+        document.getElementById('noticia-id').value              = objetoNoticia.id;
+        document.getElementById('noticia-titulo-input').value    = objetoNoticia.titulo;
+        document.getElementById('noticia-autor-input').value     = objetoNoticia.autor || '';
+        document.getElementById('noticia-contenido').value       = objetoNoticia.contenido;
 
         // Mostramos el nombre del archivo de imagen actual (si tiene).
         var elementoTextoArchivoHtml = document.getElementById('file-input-text');
         if (objetoNoticia.nombreImagen && objetoNoticia.nombreImagen !== 'null' && objetoNoticia.nombreImagen !== '') {
+            // La noticia tiene imagen → mostramos su nombre de archivo.
             elementoTextoArchivoHtml.textContent = objetoNoticia.nombreImagen;
         } else {
+            // La noticia no tiene imagen → mostramos el texto por defecto.
             elementoTextoArchivoHtml.textContent = 'Ningún archivo seleccionado';
         }
 
@@ -220,6 +229,7 @@ function abrirModalNoticia(objetoNoticia) {
         botonEliminarHtml.style.display = 'block';
 
         // Guardamos el id en una variable local para usarlo en el onclick (closure).
+        // Esto es necesario para que el botón "Eliminar" recuerde el ID de esta noticia.
         var idDeLaNoticia = objetoNoticia.id;
         botonEliminarHtml.onclick = function() {
             eliminarNoticia(idDeLaNoticia);
@@ -228,8 +238,8 @@ function abrirModalNoticia(objetoNoticia) {
     } else {
         // MODO CREACIÓN: formulario completamente vacío.
         document.getElementById('modal-noticia-titulo').textContent = 'Crear noticia';
-        document.getElementById('noticia-id').value              = '';
-        document.getElementById('file-input-text').textContent   = 'Ningún archivo seleccionado';
+        document.getElementById('noticia-id').value                 = '';
+        document.getElementById('file-input-text').textContent      = 'Ningún archivo seleccionado';
         botonGuardarHtml.textContent = 'Crear';
 
         // Ocultamos el botón de eliminar (no tiene sentido en modo creación).
@@ -261,12 +271,25 @@ function guardarNoticia(eventoSubmit) {
 
     // Leemos el campo oculto "id":
     //   - Si tiene valor → es una noticia existente → actualizamos.
-    //   - Si está vacío → es nueva → creamos.
+    //   - Si está vacío  → es nueva               → creamos.
     var idDeLaNoticia = datosDelFormulario.get('id');
-    var urlDeDestinoBackend = idDeLaNoticia ? '../api/noticias/actualizar' : '../api/noticias';
 
-    // POST al endpoint correspondiente con el formulario como body.
-    fetch(urlDeDestinoBackend, { method: 'POST', body: datosDelFormulario })
+    // Decidimos la URL de destino según si hay ID o no.
+    var urlDeDestinoBackend;
+    if (idDeLaNoticia) {
+        // La noticia ya existe → enviamos al Servlet de actualizar.
+        urlDeDestinoBackend = '../api/noticias/actualizar';
+    } else {
+        // La noticia es nueva → enviamos al Servlet de crear.
+        urlDeDestinoBackend = '../api/noticias';
+    }
+
+    // method: 'POST' porque enviamos datos al servidor (tanto para crear como para actualizar).
+    // No ponemos Content-Type en el header porque FormData lo gestiona automáticamente.
+    fetch(urlDeDestinoBackend, {
+        method: 'POST',
+        body: datosDelFormulario
+    })
         // .then(): comprobamos si el servidor respondió con éxito.
         .then(function(respuestaServidor) {
             if (respuestaServidor.ok) {
@@ -275,7 +298,7 @@ function guardarNoticia(eventoSubmit) {
                 cargarNoticiasAdmin();
             } else {
                 // Error del servidor → intentamos leer el mensaje de error en JSON.
-                // Encadenamos otro .then() al res.json() para leer el cuerpo.
+                // Encadenamos otro .then() al respuestaServidor.json() para leer el cuerpo.
                 return respuestaServidor.json()
                     .then(function(datosDeErrorJson) {
                         alert('Error: ' + (datosDeErrorJson.message || respuestaServidor.status));
@@ -303,11 +326,12 @@ function guardarNoticia(eventoSubmit) {
    Pide confirmación y, si el usuario acepta, elimina la noticia con el ID dado.
    -------------------------------------------------------------------------- */
 function eliminarNoticia(idDeLaNoticia) {
-    // confirm() muestra un diálogo "Aceptar / Cancelar".
+    // confirm() muestra un diálogo "Aceptar / Cancelar" al usuario.
     // Si el usuario cancela → confirm() devuelve false → salimos sin hacer nada.
     if (!confirm('¿Seguro que deseas eliminar esta noticia?')) return;
 
-    // POST /api/noticias/eliminar con el ID como parámetro en el body.
+    // method: 'POST' porque modificamos datos en el servidor (borramos una fila de la BD).
+    // body: "id=5" → el Servlet lee este valor con request.getParameter("id").
     fetch('../api/noticias/eliminar', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -333,12 +357,12 @@ function eliminarNoticia(idDeLaNoticia) {
 /* ==========================================================================
    FUNCIONES DE MODAL
    ========================================================================== */
-function abrirModal(idDelModal) { 
-    document.getElementById(idDelModal).style.display = 'flex'; 
+function abrirModal(idDelModal) {
+    document.getElementById(idDelModal).style.display = 'flex';
 }
 
-function cerrarModal(idDelModal) { 
-    document.getElementById(idDelModal).style.display = 'none'; 
+function cerrarModal(idDelModal) {
+    document.getElementById(idDelModal).style.display = 'none';
 }
 
 
@@ -354,10 +378,10 @@ document.getElementById('noticia-imagen').addEventListener('change', function() 
     // "this" hace referencia al input de archivo que disparó el evento.
     // "this.files" es la lista de archivos seleccionados (FileList).
     if (this.files && this.files.length > 0) {
-        // Mostramos el nombre del primer archivo seleccionado.
+        // El usuario seleccionó al menos un archivo → mostramos el nombre del primero.
         elementoTextoArchivoHtml.textContent = this.files[0].name;
     } else {
+        // No hay archivos seleccionados → mostramos el texto por defecto.
         elementoTextoArchivoHtml.textContent = 'Ningún archivo seleccionado';
     }
 });
-

@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    app.js — JAVASCRIPT DE LA PÁGINA PÚBLICA (index.html)
 
    Este archivo controla la página principal del portal de noticias.
@@ -9,6 +9,7 @@
      4. Adaptar la interfaz según si hay admin logueado o no.
    ========================================================================== */
 
+
 /* ==========================================================================
    EVENTOS (LISTENERS)
 
@@ -16,10 +17,9 @@
    y construyó el DOM. Es el momento correcto para añadir listeners y
    manipular elementos, porque antes podrían no existir todavía.
    ========================================================================== */
+document.addEventListener('DOMContentLoaded', function() {
 
-
-    document.addEventListener('DOMContentLoaded', function() {
-// Primero cargamos las noticias. Cuando terminen, comprobamos la sesión
+    // Primero cargamos las noticias. Cuando terminen, comprobamos la sesión
     // para mostrar u ocultar los controles de admin en el header.
     // Usamos .then() para asegurarnos de que comprobarSesion() se ejecute
     // DESPUÉS de que las noticias ya estén en el DOM.
@@ -29,6 +29,7 @@
 
     // Al hacer clic en "Iniciar sesión" → abrimos el modal de login.
     document.getElementById('boton-abrir-login').onclick = function(evento) {
+        // Cancelamos el comportamiento por defecto del botón (recargar la página).
         evento.preventDefault();
         abrirModal('modal-login');
     };
@@ -41,6 +42,7 @@
     // Al enviar el formulario de login → llamamos a iniciarSesion().
     document.getElementById('form-login').onsubmit = iniciarSesion;
 });
+
 
 /* ==========================================================================
    PETICIONES AL BACKEND (SERVLETS JAVA) Y PINTADO DEL DOM
@@ -58,7 +60,10 @@ function cargarNoticias() {
     // fetch() devuelve una Promise que se resuelve con el objeto Response HTTP.
     // La URL "../api/noticias/listar" apunta al Servlet ListarNoticiasServlet.
     // ".." sube un nivel desde /view/ hasta la raíz de la aplicación.
-    return fetch('../api/noticias/listar')
+    // method: 'GET' indica que es una petición de LECTURA (solo consulta datos, no los modifica).
+    return fetch('../api/noticias/listar', {
+        method: 'GET'
+    })
         // PRIMER .then(): recibe la respuesta HTTP y parsea el JSON.
         .then(function(respuestaHttp) {
             return respuestaHttp.json();
@@ -82,10 +87,16 @@ function cargarNoticias() {
                 // Asignamos la clase CSS para dar estilo de tarjeta.
                 articuloHtml.className = 'tarjeta-noticia';
 
-                // Si la noticia tiene imagen → usamos su URL. Si no → usamos una por defecto.
-                var rutaImagen = (noticiaActual.nombreImagen && noticiaActual.nombreImagen !== 'null' && noticiaActual.nombreImagen !== '')
-                    ? '../uploads/' + noticiaActual.nombreImagen
-                    : 'https://placehold.co/600x400/1a1a2e/e0e0e0?text=Nexo+Digital';
+                // Decidimos qué imagen mostrar en la tarjeta.
+                var rutaImagen;
+                if (noticiaActual.nombreImagen && noticiaActual.nombreImagen !== 'null' && noticiaActual.nombreImagen !== '') {
+                    // La noticia tiene imagen guardada → construimos la URL de la imagen subida.
+                    // "../uploads/" apunta a la carpeta donde el Servlet guarda los archivos.
+                    rutaImagen = '../uploads/' + noticiaActual.nombreImagen;
+                } else {
+                    // La noticia no tiene imagen → usamos una imagen de placeholder genérica.
+                    rutaImagen = 'https://placehold.co/600x400/1a1a2e/e0e0e0?text=Nexo+Digital';
+                }
 
                 // Escribimos el HTML interno de la tarjeta con la imagen y el título.
                 articuloHtml.innerHTML =
@@ -94,6 +105,8 @@ function cargarNoticias() {
 
                 // Al hacer clic en la tarjeta, navegamos a la página de la noticia completa.
                 // Usamos una función anónima autoejecutable para "recordar" el ID correcto.
+                // Esto es necesario porque si no, el bucle forEach termina y todas las tarjetas
+                // recordarían el último ID de la lista (un bug clásico de JavaScript con bucles).
                 (function(idDeLaNoticia) {
                     articuloHtml.onclick = function() {
                         window.location.href = 'noticia.html?id=' + idDeLaNoticia;
@@ -117,12 +130,12 @@ function cargarNoticias() {
    Un modal es una ventana emergente que se controla con CSS:
    display 'flex' lo muestra, 'none' lo oculta.
    -------------------------------------------------------------------------- */
-function abrirModal(idDelModal) { 
-    document.getElementById(idDelModal).style.display = 'flex'; 
+function abrirModal(idDelModal) {
+    document.getElementById(idDelModal).style.display = 'flex';
 }
 
-function cerrarModal(idDelModal) { 
-    document.getElementById(idDelModal).style.display = 'none'; 
+function cerrarModal(idDelModal) {
+    document.getElementById(idDelModal).style.display = 'none';
 }
 
 
@@ -142,17 +155,21 @@ function iniciarSesion(eventoSubmit) {
     eventoSubmit.preventDefault();
 
     // Leemos los valores escritos por el usuario en los campos del formulario.
-    var nombreUsuario = document.getElementById('usuario').value;
+    var nombreUsuario   = document.getElementById('usuario').value;
     var contrasenaUsuario = document.getElementById('password').value;
 
     // Enviamos la petición POST al Servlet de Login.
+    // method: 'POST' indica que enviamos datos al servidor (usuario y contraseña).
+    // header 'Content-Type' le dice al servidor en qué formato vienen los datos del body.
+    // body: los datos del formulario empaquetados como clave=valor&clave=valor.
+    // encodeURIComponent() convierte caracteres especiales (ej: espacios, @) a formato seguro para la URL.
     fetch('../api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: 'usuario=' + encodeURIComponent(nombreUsuario) + '&password=' + encodeURIComponent(contrasenaUsuario)
     })
         // .then(): recibe la respuesta del servidor.
-        // res.ok es true si el código HTTP es 200 (éxito).
+        // respuestaServidor.ok es true si el código HTTP es 200 (éxito).
         .then(function(respuestaServidor) {
             if (respuestaServidor.ok) {
                 // Login correcto → redirigimos al panel de administración.
@@ -177,8 +194,11 @@ function iniciarSesion(eventoSubmit) {
    Ajusta la interfaz (botones de la barra de navegación) según el resultado.
    -------------------------------------------------------------------------- */
 function comprobarSesion() {
-    // GET /api/sesion → SesionServlet devuelve {"logueado": true/false, "usuario": "..."}
-    fetch('../api/sesion')
+    // method: 'GET' porque solo consultamos si hay sesión, no modificamos nada.
+    // El Servlet SesionServlet responde con: {"logueado": true/false, "usuario": "..."}
+    fetch('../api/sesion', {
+        method: 'GET'
+    })
         // Primer .then(): parseamos el JSON de la respuesta.
         .then(function(respuestaServidor) {
             return respuestaServidor.json();
@@ -202,20 +222,17 @@ function comprobarSesion() {
    un administrador logueado o no.
    -------------------------------------------------------------------------- */
 function actualizarInterfazUsuario(estaLogueado) {
-    // Referencia a los dos grupos de controles del header.
-    var controlesDelAdministrador = document.getElementById('controles-admin');    // "Panel Admin"
-    var controlesDelPublico = document.getElementById('controles-publicos'); // "Admin" (Login)
+    // Referencia a los dos grupos de controles del footer.
+    var controlesDelAdministrador = document.getElementById('controles-admin');    // Botón "Panel Admin"
+    var controlesDelPublico       = document.getElementById('controles-publicos'); // Botón "Admin" (Login)
 
     if (estaLogueado) {
-        // Admin logueado → mostramos sus controles y ocultamos los públicos.
+        // Admin logueado → mostramos sus controles y ocultamos el botón de login.
         controlesDelAdministrador.style.display = 'block';
-        controlesDelPublico.style.display = 'none';
+        controlesDelPublico.style.display       = 'none';
     } else {
-        // Sin sesión → mostramos los controles públicos y ocultamos los de admin.
+        // Sin sesión activa → mostramos el botón de login y ocultamos los controles de admin.
         controlesDelAdministrador.style.display = 'none';
-        controlesDelPublico.style.display = 'block';
+        controlesDelPublico.style.display       = 'block';
     }
 }
-
-
-
