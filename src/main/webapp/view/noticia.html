@@ -99,19 +99,19 @@
         <article class="noticia-completa">
 
             <!-- Relleno por noticia.js con n.titulo al recibir la respuesta. -->
-            <h2 id="noticia-titulo">Cargando...</h2>
+            <h2 id="titulo-noticia">Cargando...</h2>
 
             <!-- Relleno por noticia.js con autor y fecha formateada.
                  Ejemplo: <span>María García</span><span>23 de mayo de 2026</span> -->
-            <div id="noticia-meta" class="meta-noticia"></div>
+            <div id="metadatos-noticia" class="meta-noticia"></div>
 
             <!-- display:none por defecto.
                  noticia.js lo muestra y asigna el src solo si la noticia tiene imagen.
                  La URL "../uploads/abc123.jpg" es interceptada por ServirImagenServlet. -->
-            <img id="noticia-imagen" src="" alt="Imagen de la noticia" class="imagen-hero" style="display:none;">
+            <img id="campo-archivo-imagen" src="" alt="Imagen de la noticia" class="imagen-hero" style="display:none;">
 
             <!-- Relleno por noticia.js con párrafos <p> del contenido de la noticia. -->
-            <div id="noticia-cuerpo" class="cuerpo-texto"></div>
+            <div id="cuerpo-noticia" class="cuerpo-texto"></div>
 
         </article>
     </main>
@@ -133,16 +133,16 @@
                           Comprueba si tiene el atributo "adminLogueado".
                           Responde: {"logueado": true/false, "usuario": "..."}
                    5. [noticia.js] actualizarUI(data.logueado):
-                          Si logueado=true  → muestra #controles-admin.
-                          Si logueado=false → muestra #controles-publicos.
+                          Si logueado=true  → muestra #controles-administrador.
+                          Si logueado=false → muestra #controles-publico.
             ======================================================= -->
-            <div id="controles-publicos">
+            <div id="controles-publico">
                 <!-- ===== BOTÓN "Admin" ================================
                      RUTA LÓGICA:
                        1. [noticia.html] Botón con id="boton-abrir-login".
                        2. [noticia.js] DOMContentLoaded asigna:
                               document.getElementById('boton-abrir-login').onclick
-                              = function() { abrirModal('modal-login'); }
+                              = function() { abrirModal('ventana-emergente-login'); }
                        3. abrirModal(): style.display = 'flex' → modal visible.
                        ⚠️ No contacta al servidor. Solo muestra el modal.
                 ========================================================= -->
@@ -150,7 +150,7 @@
             </div>
 
             <!-- Visible solo si hay admin logueado. -->
-            <div id="controles-admin" style="display:none;">
+            <div id="controles-administradoristrador" style="display:none;">
                 <a href="admin.html" class="btn-texto-azul">Panel de admin</a>
             </div>
         </div>
@@ -162,9 +162,9 @@
          HTML, su propio JS (noticia.js) y su propio DOM.
 
          RUTA LÓGICA al enviar el formulario:
-           1. [noticia.html] Formulario id="form-login".
+           1. [noticia.html] Formulario id="formulario-login".
            2. [noticia.js] DOMContentLoaded asigna:
-                  document.getElementById('form-login').onsubmit = iniciarSesion
+                  document.getElementById('formulario-login').onsubmit = iniciarSesion
            3. [noticia.js] iniciarSesion(e):
                   e.preventDefault()
                   Lee usuario y password de los campos.
@@ -185,23 +185,23 @@
 
          BOTÓN CERRAR:
            1. [noticia.html] id="boton-cerrar-login".
-           2. [noticia.js] onclick → cerrarModal('modal-login')
+           2. [noticia.js] onclick → cerrarModal('ventana-emergente-login')
               → style.display = 'none'.
     ============================================================= -->
-    <div id="modal-login" class="modal" style="display:none;">
+    <div id="ventana-emergente-login" class="modal" style="display:none;">
         <div class="modal-contenido">
             <button class="cerrar" id="boton-cerrar-login">&times;</button>
             <h2>Acceso administrador</h2>
-            <form id="form-login">
+            <form id="formulario-login">
                 <div class="grupo-input">
-                    <label for="usuario">Usuario:</label>
-                    <input type="text" id="usuario" name="usuario" required>
+                    <label for="campo-usuario">Usuario:</label>
+                    <input type="text" id="campo-usuario" name="usuario" required>
                 </div>
                 <div class="grupo-input">
-                    <label for="password">Contraseña:</label>
-                    <input type="password" id="password" name="password" required>
+                    <label for="campo-contrasena">Contraseña:</label>
+                    <input type="password" id="campo-contrasena" name="password" required>
                 </div>
-                <button type="submit" class="btn-azul btn-grande">Entrar</button>
+                <button type="submit" class="btn-azul boton-grande">Entrar</button>
             </form>
         </div>
     </div>

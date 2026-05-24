@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    noticia.js — JAVASCRIPT DE LA PÁGINA DE DETALLE DE NOTICIA (noticia.html)
 
    Este archivo controla la página que muestra una noticia completa.
@@ -25,14 +25,14 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('boton-abrir-login').onclick = function(evento) {
         // Cancelamos el comportamiento por defecto del botón (recargar la página).
         evento.preventDefault();
-        abrirModal('modal-login');
+        abrirModal('ventana-emergente-login');
     };
 
     document.getElementById('boton-cerrar-login').onclick = function() {
-        cerrarModal('modal-login');
+        cerrarModal('ventana-emergente-login');
     };
 
-    document.getElementById('form-login').onsubmit = iniciarSesion;
+    document.getElementById('formulario-login').onsubmit = iniciarSesion;
 });
 
 
@@ -49,20 +49,20 @@ document.addEventListener('DOMContentLoaded', function() {
 function cargarNoticiaIndividual() {
     // URLSearchParams analiza los parámetros de la URL de la página actual.
     // Por ejemplo, si la URL es "noticia.html?id=5", window.location.search es "?id=5".
-    var parametrosDeLaUrl = new URLSearchParams(window.location.search);
+    var parametrosUrl = new URLSearchParams(window.location.search);
 
     // params.get('id') extrae el valor del parámetro "id".
     // Resultado: la cadena "5" (como texto, no como número).
-    var idDeLaNoticiaEnUrl = parametrosDeLaUrl.get('id');
+    var idNoticiaUrl = parametrosUrl.get('id');
 
     // Referencia al elemento del título para poder modificarlo si hay errores.
-    var elementoHtmlTitulo = document.getElementById('noticia-titulo');
+    var elementoHtmlTitulo = document.getElementById('titulo-noticia');
 
     // Si el elemento no existe en el HTML, salimos (prevención de errores).
     if (!elementoHtmlTitulo) return;
 
     // Si no hay ID en la URL, no sabemos qué noticia cargar. Mostramos error y salimos.
-    if (!idDeLaNoticiaEnUrl) {
+    if (!idNoticiaUrl) {
         elementoHtmlTitulo.textContent = 'Noticia no encontrada';
         return;
     }
@@ -70,7 +70,7 @@ function cargarNoticiaIndividual() {
     // Hacemos GET al Servlet con el ID como parámetro en la URL.
     // El parámetro ?id=5 lo recibe el Servlet con request.getParameter("id").
     // method: 'GET' porque solo consultamos datos, no los modificamos.
-    fetch('../api/noticias/obtener?id=' + idDeLaNoticiaEnUrl, {
+    fetch('../api/noticias/obtener?id=' + idNoticiaUrl, {
         method: 'GET'
     })
         // Primer .then(): comprobamos el código HTTP y parseamos el JSON.
@@ -87,10 +87,10 @@ function cargarNoticiaIndividual() {
         .then(function(noticiaRecibida) {
 
             // TÍTULO:
-            document.getElementById('noticia-titulo').textContent = noticiaRecibida.titulo;
+            document.getElementById('titulo-noticia').textContent = noticiaRecibida.titulo;
 
             // METADATOS (autor y fecha):
-            var elementoHtmlMeta = document.getElementById('noticia-meta');
+            var elementoHtmlMeta = document.getElementById('metadatos-noticia');
 
             // Decidimos qué texto de autor mostrar.
             var textoAutor;
@@ -120,7 +120,7 @@ function cargarNoticiaIndividual() {
             elementoHtmlMeta.innerHTML = '<span>' + textoAutor + '</span><span>' + textoFecha + '</span>';
 
             // IMAGEN:
-            var elementoHtmlImagen = document.getElementById('noticia-imagen');
+            var elementoHtmlImagen = document.getElementById('campo-archivo-imagen');
             if (noticiaRecibida.nombreImagen && noticiaRecibida.nombreImagen !== 'null' && noticiaRecibida.nombreImagen !== '') {
                 // La noticia tiene imagen → asignamos la URL y la mostramos.
                 elementoHtmlImagen.src          = '../uploads/' + noticiaRecibida.nombreImagen;
@@ -136,19 +136,19 @@ function cargarNoticiaIndividual() {
                 // split('\n') divide el texto en un array de párrafos separados por salto de línea.
                 // map() envuelve cada párrafo en etiquetas <p> para que se vea como párrafo en HTML.
                 // join('') une el array de vuelta a un String único.
-                document.getElementById('noticia-cuerpo').innerHTML =
+                document.getElementById('cuerpo-noticia').innerHTML =
                     noticiaRecibida.contenido.split('\n').map(function(parrafoIndividual) {
                         return '<p>' + parrafoIndividual + '</p>';
                     }).join('');
             } else {
                 // La noticia no tiene contenido → mostramos un mensaje informativo.
-                document.getElementById('noticia-cuerpo').innerHTML = '<p>Sin contenido.</p>';
+                document.getElementById('cuerpo-noticia').innerHTML = '<p>Sin contenido.</p>';
             }
         })
         // .catch(): captura errores de red o errores lanzados manualmente con throw.
         .catch(function(errorDetectado) {
             console.error('Error al cargar la noticia:', errorDetectado);
-            document.getElementById('noticia-titulo').textContent = 'Error al cargar la noticia';
+            document.getElementById('titulo-noticia').textContent = 'Error al cargar la noticia';
         });
 }
 
@@ -173,8 +173,8 @@ function iniciarSesion(eventoSubmit) {
     eventoSubmit.preventDefault();
 
     // Leemos los valores escritos por el usuario en los campos del formulario.
-    var nombreUsuario     = document.getElementById('usuario').value;
-    var contrasenaUsuario = document.getElementById('password').value;
+    var nombreUsuario     = document.getElementById('campo-usuario').value;
+    var contrasenaUsuario = document.getElementById('campo-contrasena').value;
 
     // method: 'POST' porque enviamos datos sensibles (contraseña) al servidor.
     // encodeURIComponent() convierte caracteres especiales a formato seguro para la URL.
@@ -194,8 +194,8 @@ function iniciarSesion(eventoSubmit) {
             }
         })
         // .catch(): error de red (sin internet, servidor caído).
-        .catch(function(errorDeRed) {
-            console.error('Error al iniciar sesión:', errorDeRed);
+        .catch(function(errorRed) {
+            console.error('Error al iniciar sesión:', errorRed);
             alert('Error de conexión con el servidor');
         });
 }
@@ -238,16 +238,16 @@ function comprobarSesion() {
    Muestra u oculta los controles del footer según si hay admin logueado o no.
    -------------------------------------------------------------------------- */
 function actualizarInterfazUsuario(estaLogueado) {
-    var controlesDelAdministrador = document.getElementById('controles-admin');    // Botón "Panel Admin"
-    var controlesDelPublico       = document.getElementById('controles-publicos'); // Botón "Admin" (Login)
+    var controlesAdministrador = document.getElementById('controles-administradoristrador');    // Botón "Panel Admin"
+    var controlesPublico       = document.getElementById('controles-publico'); // Botón "Admin" (Login)
 
     if (estaLogueado) {
         // Admin logueado → mostramos sus controles y ocultamos el botón de login.
-        controlesDelAdministrador.style.display = 'block';
-        controlesDelPublico.style.display       = 'none';
+        controlesAdministrador.style.display = 'block';
+        controlesPublico.style.display       = 'none';
     } else {
         // Sin sesión activa → mostramos el botón de login y ocultamos los controles de admin.
-        controlesDelAdministrador.style.display = 'none';
-        controlesDelPublico.style.display       = 'block';
+        controlesAdministrador.style.display = 'none';
+        controlesPublico.style.display       = 'block';
     }
 }

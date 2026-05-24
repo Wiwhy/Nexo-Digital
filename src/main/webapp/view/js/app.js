@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    app.js — JAVASCRIPT DE LA PÁGINA PÚBLICA (index.html)
 
    Este archivo controla la página principal del portal de noticias.
@@ -31,16 +31,16 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('boton-abrir-login').onclick = function(evento) {
         // Cancelamos el comportamiento por defecto del botón (recargar la página).
         evento.preventDefault();
-        abrirModal('modal-login');
+        abrirModal('ventana-emergente-login');
     };
 
     // Al hacer clic en el botón de cerrar → cerramos el modal.
     document.getElementById('boton-cerrar-login').onclick = function() {
-        cerrarModal('modal-login');
+        cerrarModal('ventana-emergente-login');
     };
 
     // Al enviar el formulario de login → llamamos a iniciarSesion().
-    document.getElementById('form-login').onsubmit = iniciarSesion;
+    document.getElementById('formulario-login').onsubmit = iniciarSesion;
 });
 
 
@@ -71,7 +71,7 @@ function cargarNoticias() {
         // SEGUNDO .then(): recibe la lista de noticias ya convertida a objetos JavaScript.
         .then(function(listaDeNoticias) {
             // Buscamos el contenedor de la cuadrícula de noticias en el HTML.
-            var contenedorCuadricula = document.getElementById('grid-todas');
+            var contenedorCuadricula = document.getElementById('cuadricula-noticias');
 
             // Si el elemento no existe (prevención de errores), salimos.
             if (!contenedorCuadricula) return;
@@ -100,16 +100,16 @@ function cargarNoticias() {
 
                 // Escribimos el HTML interno de la tarjeta con la imagen y el título.
                 articuloHtml.innerHTML =
-                    '<img src="' + rutaImagen + '" class="imagen-placeholder" alt="' + noticiaActual.titulo + '">' +
+                    '<img src="' + rutaImagen + '" class="imagen-tarjeta" alt="' + noticiaActual.titulo + '">' +
                     '<div class="contenido-tarjeta"><h3>' + noticiaActual.titulo + '</h3></div>';
 
                 // Al hacer clic en la tarjeta, navegamos a la página de la noticia completa.
                 // Usamos una función anónima autoejecutable para "recordar" el ID correcto.
                 // Esto es necesario porque si no, el bucle forEach termina y todas las tarjetas
                 // recordarían el último ID de la lista (un bug clásico de JavaScript con bucles).
-                (function(idDeLaNoticia) {
+                (function(idNoticia) {
                     articuloHtml.onclick = function() {
-                        window.location.href = 'noticia.html?id=' + idDeLaNoticia;
+                        window.location.href = 'noticia.html?id=' + idNoticia;
                     };
                 })(noticiaActual.id);
 
@@ -155,8 +155,8 @@ function iniciarSesion(eventoSubmit) {
     eventoSubmit.preventDefault();
 
     // Leemos los valores escritos por el usuario en los campos del formulario.
-    var nombreUsuario   = document.getElementById('usuario').value;
-    var contrasenaUsuario = document.getElementById('password').value;
+    var nombreUsuario   = document.getElementById('campo-usuario').value;
+    var contrasenaUsuario = document.getElementById('campo-contrasena').value;
 
     // Enviamos la petición POST al Servlet de Login.
     // method: 'POST' indica que enviamos datos al servidor (usuario y contraseña).
@@ -180,8 +180,8 @@ function iniciarSesion(eventoSubmit) {
             }
         })
         // .catch(): se ejecuta si hay error de RED (sin internet, servidor caído).
-        .catch(function(errorDeRed) {
-            console.error('Error al iniciar sesión:', errorDeRed);
+        .catch(function(errorRed) {
+            console.error('Error al iniciar sesión:', errorRed);
             alert('Error de conexión con el servidor');
         });
 }
@@ -223,16 +223,16 @@ function comprobarSesion() {
    -------------------------------------------------------------------------- */
 function actualizarInterfazUsuario(estaLogueado) {
     // Referencia a los dos grupos de controles del footer.
-    var controlesDelAdministrador = document.getElementById('controles-admin');    // Botón "Panel Admin"
-    var controlesDelPublico       = document.getElementById('controles-publicos'); // Botón "Admin" (Login)
+    var controlesAdministrador = document.getElementById('controles-administradoristrador');    // Botón "Panel Admin"
+    var controlesPublico       = document.getElementById('controles-publico'); // Botón "Admin" (Login)
 
     if (estaLogueado) {
         // Admin logueado → mostramos sus controles y ocultamos el botón de login.
-        controlesDelAdministrador.style.display = 'block';
-        controlesDelPublico.style.display       = 'none';
+        controlesAdministrador.style.display = 'block';
+        controlesPublico.style.display       = 'none';
     } else {
         // Sin sesión activa → mostramos el botón de login y ocultamos los controles de admin.
-        controlesDelAdministrador.style.display = 'none';
-        controlesDelPublico.style.display       = 'block';
+        controlesAdministrador.style.display = 'none';
+        controlesPublico.style.display       = 'block';
     }
 }

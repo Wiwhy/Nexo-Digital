@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    estilos.css — HOJA DE ESTILOS PRINCIPAL
    Compartida por todas las páginas del proyecto.
    Contiene: variables globales, reset, tipografía, layout,
@@ -113,13 +113,13 @@ h2 {
     font-weight: 700;
 }
 
-/* h3, label, input, textarea y .titulo-noticia-lista comparten el mismo
+/* h3, label, input, textarea y .titulo-lista-admin comparten el mismo
    tamaño de fuente base (1rem = 16px) y peso semibold (600). */
 h3,
 label,
 input,
 textarea,
-.titulo-noticia-lista {
+.titulo-lista-admin {
     font-size: 1rem;
     font-weight: 600;
 }
@@ -373,7 +373,7 @@ textarea,
 }
 
 /* Botón pequeño: para listas y acciones secundarias (ej. "Editar"). */
-.btn-pequeno {
+.boton-pequeno {
     padding: 0 !important;
     height: 2.5rem !important;
     width: 6.5rem !important;
@@ -381,7 +381,7 @@ textarea,
 }
 
 /* Botón grande: para acciones principales (ej. "Entrar", "Guardar"). */
-.btn-grande {
+.boton-grande {
     padding: 0 !important;
     height: 2.8rem !important;
     width: 7.5rem !important;
@@ -389,7 +389,7 @@ textarea,
 }
 
 /* Variante de botón grande que ocupa el ancho completo (en formularios). */
-.ancho-total {
+.boton-boton-ancho-total {
     width: 7.5rem !important;
     margin-top: 1rem !important;
 }

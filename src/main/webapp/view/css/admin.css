@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    admin.css — HOJA DE ESTILOS DEL PANEL DE ADMINISTRACIÓN
    Se carga SOLO en admin.html, complementando a estilos.css.
    Contiene estilos específicos de: la tarjeta del panel,
@@ -92,7 +92,7 @@
      con ellipsis porque los ítems flex tienen min-width: auto por defecto.
    white-space: nowrap + overflow: hidden + text-overflow: ellipsis → si el título
      es muy largo, muestra "..." al final en lugar de romper el layout. */
-.titulo-noticia-lista {
+.titulo-lista-admin {
     flex: 1;
     min-width: 0;
     white-space: nowrap;

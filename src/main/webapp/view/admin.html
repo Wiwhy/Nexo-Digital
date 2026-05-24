@@ -71,13 +71,13 @@
                               - Pone el título del modal: "Crear noticia"
                               - Vacía el campo oculto id: noticia-id.value = ''
                               - Oculta el botón "Eliminar" (no aplica al crear)
-                              - Llama a abrirModal('modal-noticia')
+                              - Llama a abrirModal('ventana-emergente-noticia')
                                 → style.display = 'flex' → el modal aparece.
                        4. El usuario rellena el formulario y pulsa "Crear".
-                          → Ver el comentario del <form id="form-noticia"> abajo.
+                          → Ver el comentario del <form id="formulario-noticia"> abajo.
                        ⚠️ Este botón NO contacta al servidor. Solo muestra el modal.
                 ========================================================= -->
-                <button class="btn-azul btn-pequeno" id="boton-nueva-noticia">Crear</button>
+                <button class="btn-azul boton-pequeno" id="boton-nueva-noticia">Crear</button>
             </div>
 
             <!-- ===== LISTA DE NOTICIAS ============================
@@ -148,14 +148,14 @@
     <!-- ===== MODAL DE CREACIÓN / EDICIÓN DE NOTICIAS =============
          RUTA LÓGICA al enviar el formulario (botón "Guardar" / "Crear"):
 
-         El campo oculto <input id="noticia-id"> decide qué operación hacer:
+         El campo oculto <input id="campo-oculto-id"> decide qué operación hacer:
            - Si está VACÍO → modo CREACIÓN → POST a /api/noticias → INSERT en MySQL
            - Si tiene un ID → modo EDICIÓN  → POST a /api/noticias/actualizar → UPDATE en MySQL
 
          FLUJO MODO CREACIÓN (campo id vacío):
-           1. [admin.html] Formulario id="form-noticia".
+           1. [admin.html] Formulario id="formulario-noticia".
            2. [admin.js] DOMContentLoaded asigna:
-                  document.getElementById('form-noticia').onsubmit = guardarNoticia
+                  document.getElementById('formulario-noticia').onsubmit = guardarNoticia
            3. [admin.js] guardarNoticia(e):
                   e.preventDefault()
                   formData = new FormData(e.target)
@@ -178,7 +178,7 @@
            7. [MySQL] Inserta la fila y devuelve éxito.
            8. [CrearNoticiaServlet] Responde: {"status":"success", ...}
            9. [admin.js] El .then() recibe res.ok=true:
-                  cerrarModal('modal-noticia') → oculta el modal.
+                  cerrarModal('ventana-emergente-noticia') → oculta el modal.
                   cargarNoticiasAdmin() → recarga la lista con la nueva noticia.
 
          FLUJO MODO EDICIÓN (campo id tiene valor, ej: "5"):
@@ -215,57 +215,57 @@
            1. [admin.html] Botón con id="boton-cerrar-modal-noticia".
            2. [admin.js] DOMContentLoaded asigna:
                   document.getElementById('boton-cerrar-modal-noticia').onclick
-                  = function() { cerrarModal('modal-noticia'); }
+                  = function() { cerrarModal('ventana-emergente-noticia'); }
            3. cerrarModal(): style.display = 'none' → modal desaparece.
     ============================================================= -->
-    <div id="modal-noticia" class="modal" style="display:none;">
+    <div id="ventana-emergente-noticia" class="modal" style="display:none;">
         <div class="modal-contenido">
             <button class="cerrar" id="boton-cerrar-modal-noticia">&times;</button>
 
             <!-- admin.js cambia este texto entre "Crear noticia" y "Editar noticia". -->
-            <h2 id="modal-noticia-titulo">Editar noticia</h2>
+            <h2 id="titulo-ventana-emergente">Editar noticia</h2>
 
-            <form id="form-noticia" enctype="multipart/form-data">
+            <form id="formulario-noticia" enctype="multipart/form-data">
 
                 <!-- Campo oculto: el usuario no lo ve, pero el JS lo lee.
                      Vacío = modo CREACIÓN.
                      Con valor = modo EDICIÓN (admin.js lo rellena al abrir el modal de edición). -->
-                <input type="hidden" name="id" id="noticia-id">
+                <input type="hidden" name="id" id="campo-oculto-id">
 
                 <div class="grupo-input">
-                    <label for="noticia-titulo-input">Título:</label>
-                    <input type="text" id="noticia-titulo-input" name="titulo" required>
+                    <label for="campo-titulo">Título:</label>
+                    <input type="text" id="campo-titulo" name="titulo" required>
                 </div>
 
                 <div class="grupo-input">
-                    <label for="noticia-autor-input">Autor:</label>
-                    <input type="text" id="noticia-autor-input" name="autor" required>
+                    <label for="campo-autor">Autor:</label>
+                    <input type="text" id="campo-autor" name="autor" required>
                 </div>
 
                 <div class="grupo-input">
-                    <label for="noticia-contenido">Contenido:</label>
-                    <textarea id="noticia-contenido" name="contenido" required></textarea>
+                    <label for="campo-contenido">Contenido:</label>
+                    <textarea id="campo-contenido" name="contenido" required></textarea>
                 </div>
 
                 <!-- El selector de imagen usa un input invisible encima de un botón visual.
                      admin.js actualiza el <span> con el nombre del archivo elegido. -->
                 <div class="grupo-input">
-                    <label for="noticia-imagen">Imagen:</label>
+                    <label for="campo-archivo-imagen">Imagen:</label>
                     <div class="file-input-wrapper">
                         <button type="button" class="file-input-btn">Seleccionar archivo</button>
-                        <span id="file-input-text" class="file-input-text">Ningún archivo seleccionado</span>
-                        <input type="file" id="noticia-imagen" name="imagen" accept="image/*" class="file-input-real">
+                        <span id="texto-nombre-archivo" class="file-input-text">Ningún archivo seleccionado</span>
+                        <input type="file" id="campo-archivo-imagen" name="imagen" accept="image/*" class="file-input-real">
                     </div>
                 </div>
 
                 <div class="acciones-modal-flex">
                     <!-- Botón submit: dispara el evento "submit" del formulario.
                          admin.js lo captura con onsubmit = guardarNoticia. -->
-                    <button type="submit" class="btn-azul btn-grande" id="boton-guardar-noticia">Guardar</button>
+                    <button type="submit" class="btn-azul boton-grande" id="boton-guardar-noticia">Guardar</button>
 
                     <!-- Solo visible en modo edición.
                          admin.js lo oculta (display:none) en modo creación. -->
-                    <button type="button" class="btn-azul btn-grande" id="boton-eliminar-noticia">Eliminar</button>
+                    <button type="button" class="btn-azul boton-grande" id="boton-eliminar-noticia">Eliminar</button>
                 </div>
             </form>
         </div>
