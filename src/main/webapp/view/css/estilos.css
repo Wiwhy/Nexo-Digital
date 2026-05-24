@@ -1,4 +1,4 @@
-﻿/* ============================================================
+/* ============================================================
    estilos.css — HOJA DE ESTILOS PRINCIPAL
    Compartida por todas las páginas del proyecto.
    Contiene: variables globales, reset, tipografía, layout,
@@ -141,8 +141,18 @@ textarea,
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: var(--sombra-fija);
+    position: relative;   /* Necesario para que z-index y la sombra funcionen correctamente */
     z-index: 10;
+}
+
+/* Sombra del header: proyectada hacia abajo, negro al 15% de opacidad */
+.cabecera-principal {
+    box-shadow: 0 0.25rem 0.6rem rgba(0, 0, 0, 0.15);
+}
+
+/* Sombra del footer: proyectada hacia arriba, negro al 15% de opacidad */
+.pie-pagina {
+    box-shadow: 0 -0.25rem 0.6rem rgba(0, 0, 0, 0.15);
 }
 
 /* Contenedor interno del header: limita el ancho al 65% de la pantalla
