@@ -51,11 +51,9 @@ public class ActualizarNoticiaServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         // VERIFICACIÓN DE SEGURIDAD: Solo administradores autenticados pueden actualizar.
-        // request.getSession() sin argumento obtiene la sesión actual o crea una nueva.
-        // Nota: aquí se usa getSession() sin el argumento "false" (a diferencia de CrearNoticiaServlet).
-        // Esto significa que si no hay sesión, se crea una nueva (que estará vacía),
-        // y como el atributo "adminLogueado" no existirá, el if seguirá funcionando correctamente.
-        if (request.getSession().getAttribute("adminLogueado") == null) {
+        // getSession(false) → obtiene la sesión existente sin crear una nueva.
+        // Si no hay sesión activa, devuelve null → el usuario no está autenticado.
+        if (request.getSession(false) == null || request.getSession(false).getAttribute("adminLogueado") == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
             out.print("{\"status\":\"error\", \"message\":\"No tienes permisos para realizar esta acción\"}");
             return; // Cortamos la ejecución aquí.
