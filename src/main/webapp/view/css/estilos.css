@@ -586,28 +586,31 @@ textarea,
     }
 }
 
-/* En tablets (hasta 900px aprox.):
+/* En tablets en formato horizontal (hasta 1024px aprox.):
    - El grid pasa de 3 columnas a 2 columnas. */
-@media (max-width: 56.25rem) {
+@media (max-width: 64rem) {
     .grid-noticias {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
-/* En móviles (hasta 768px):
-   - El grid pasa a 1 columna (las tarjetas van apiladas).
+/* En móviles y tablets en formato vertical (hasta 768px):
    - El artículo de noticia completa reduce su padding. */
 @media (max-width: 48rem) {
-    .grid-noticias {
-        grid-template-columns: 1fr;
-    }
-
     .noticia-completa {
         padding: 2rem;
     }
 
     .noticia-completa h2 {
         font-size: 1.8rem;
+    }
+}
+
+/* En móviles (hasta 600px aprox.):
+   - El grid pasa a 1 columna (las tarjetas van apiladas). */
+@media (max-width: 37.5rem) {
+    .grid-noticias {
+        grid-template-columns: 1fr;
     }
 }
 
