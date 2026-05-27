@@ -117,61 +117,65 @@ public class CrearNoticiaServlet extends HttpServlet {
             Part filePart = request.getPart("imagen");
             String nombreImagenFinal = null; // Nombre definitivo del archivo en el servidor.
 
-            // Comprobamos si el admin realmente subió una imagen
-            // (que no sea null y que tenga tamaño > 0).
-            if (filePart != null && filePart.getSize() > 0) {
-
-                // Obtenemos el nombre original del archivo (ej: "foto-vacaciones.jpg").
-                String nombreOriginal = filePart.getSubmittedFileName();
-                // Extraemos la extensión (ej: ".jpg", ".png").
-                // lastIndexOf(".") busca la última posición del punto en el nombre.
-                // substring() corta el String desde esa posición hasta el final.
-                String extension = nombreOriginal.substring(nombreOriginal.lastIndexOf("."));
-
-                // Generamos un nombre único usando UUID para evitar que dos archivos
-                // con el mismo nombre original se sobreescriban.
-                // UUID.randomUUID() genera algo como: "a3f2c8d1-7e45-4b09-9f2a-..."
-                nombreImagenFinal = UUID.randomUUID().toString() + extension;
-                // Resultado ejemplo: "a3f2c8d1-7e45-4b09-9f2a-abc123.jpg"
-
-                // -------------------------------------------------------
-                // LÓGICA DE RUTA DE SUBIDA
-                //
-                // En Railway (producción), se monta un volumen persistente en /datos_persistentes.
-                // Si guardamos archivos dentro del contenedor Docker sin un volumen,
-                // se pierden al reiniciar el contenedor.
-                //
-                // En local, /datos_persistentes probablemente no exista o no tengamos permisos,
-                // así que usamos la carpeta "uploads" dentro de la aplicación web como fallback.
-                // -------------------------------------------------------
-                String uploadPath = "/datos_persistentes"; // Ruta prioritaria (Railway)
-                File uploadDir = new File(uploadPath);
-
-                // Intentamos crear el directorio si no existe.
-                if (!uploadDir.exists()) {
-                    try {
-                        uploadDir.mkdirs(); // mkdirs() crea también los directorios intermedios.
-                    } catch (SecurityException ignored) {
-                        // Si no tenemos permisos (ej. en local), ignoramos el error y probamos la ruta alternativa.
-                    }
-                }
-
-                // Si /datos_persistentes no existe o no se puede escribir → usamos la ruta alternativa.
-                if (!uploadDir.exists() || !uploadDir.canWrite()) {
-                    // getServletContext().getRealPath("") devuelve la ruta absoluta en disco
-                    // de la carpeta raíz de la aplicación web desplegada en Tomcat.
-                    uploadPath = getServletContext().getRealPath("") + File.separator + "uploads";
-                    uploadDir = new File(uploadPath);
-                    if (!uploadDir.exists()) {
-                        uploadDir.mkdirs(); // Creamos la carpeta "uploads" si no existe.
-                    }
-                }
-
-                // Guardamos el archivo en el directorio determinado.
-                // filePart.write() escribe los bytes del archivo subido en la ruta indicada.
-                // File.separator es "/" en Linux/Mac y "\" en Windows (multiplataforma).
-                filePart.write(uploadPath + File.separator + nombreImagenFinal);
+            // VALIDACIÓN DE SERVIDOR: la imagen es obligatoria al crear una noticia.
+            // Si no llega archivo, o llega con tamaño 0 → rechazamos la petición.
+            if (filePart == null || filePart.getSize() == 0) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST); // 400
+                out.print("{\"status\":\"error\", \"message\":\"La imagen es obligatoria.\"}");
+                out.flush();
+                return;
             }
+
+            // Obtenemos el nombre original del archivo (ej: "foto-vacaciones.jpg").
+            String nombreOriginal = filePart.getSubmittedFileName();
+            // Extraemos la extensión (ej: ".jpg", ".png").
+            // lastIndexOf(".") busca la última posición del punto en el nombre.
+            // substring() corta el String desde esa posición hasta el final.
+            String extension = nombreOriginal.substring(nombreOriginal.lastIndexOf("."));
+
+            // Generamos un nombre único usando UUID para evitar que dos archivos
+            // con el mismo nombre original se sobreescriban.
+            // UUID.randomUUID() genera algo como: "a3f2c8d1-7e45-4b09-9f2a-..."
+            nombreImagenFinal = UUID.randomUUID().toString() + extension;
+            // Resultado ejemplo: "a3f2c8d1-7e45-4b09-9f2a-abc123.jpg"
+
+            // -------------------------------------------------------
+            // LÓGICA DE RUTA DE SUBIDA
+            //
+            // En Railway (producción), se monta un volumen persistente en /datos_persistentes.
+            // Si guardamos archivos dentro del contenedor Docker sin un volumen,
+            // se pierden al reiniciar el contenedor.
+            //
+            // En local, /datos_persistentes probablemente no exista o no tengamos permisos,
+            // así que usamos la carpeta "uploads" dentro de la aplicación web como fallback.
+            // -------------------------------------------------------
+            String uploadPath = "/datos_persistentes"; // Ruta prioritaria (Railway)
+            File uploadDir = new File(uploadPath);
+
+            // Intentamos crear el directorio si no existe.
+            if (!uploadDir.exists()) {
+                try {
+                    uploadDir.mkdirs(); // mkdirs() crea también los directorios intermedios.
+                } catch (SecurityException ignored) {
+                    // Si no tenemos permisos (ej. en local), ignoramos el error y probamos la ruta alternativa.
+                }
+            }
+
+            // Si /datos_persistentes no existe o no se puede escribir → usamos la ruta alternativa.
+            if (!uploadDir.exists() || !uploadDir.canWrite()) {
+                // getServletContext().getRealPath("") devuelve la ruta absoluta en disco
+                // de la carpeta raíz de la aplicación web desplegada en Tomcat.
+                uploadPath = getServletContext().getRealPath("") + File.separator + "uploads";
+                uploadDir = new File(uploadPath);
+                if (!uploadDir.exists()) {
+                    uploadDir.mkdirs(); // Creamos la carpeta "uploads" si no existe.
+                }
+            }
+
+            // Guardamos el archivo en el directorio determinado.
+            // filePart.write() escribe los bytes del archivo subido en la ruta indicada.
+            // File.separator es "/" en Linux/Mac y "\" en Windows (multiplataforma).
+            filePart.write(uploadPath + File.separator + nombreImagenFinal);
 
             // Creamos el objeto Noticia con los datos leídos.
             // "nombreImagenFinal" puede ser null si no se subió imagen → el DAO lo gestiona.
