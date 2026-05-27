@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    app.js — JAVASCRIPT DE LA PÁGINA PÚBLICA (index.html)
 
    Este archivo controla la página principal del portal de noticias.
@@ -111,6 +111,19 @@ function cargarNoticias() {
                     articuloHtml.onclick = function() {
                         window.location.href = 'noticia.html?id=' + idNoticia;
                     };
+                    // Accesibilidad: la tarjeta debe ser navegable con teclado.
+                    // tabindex="0" → el elemento puede recibir foco con la tecla Tab.
+                    // role="button" → indica a los lectores de pantalla que es interactivo.
+                    articuloHtml.setAttribute('tabindex', '0');
+                    articuloHtml.setAttribute('role', 'button');
+                    articuloHtml.setAttribute('aria-label', 'Leer noticia: ' + noticiaActual.titulo);
+                    // Al pulsar Enter o Espacio con la tarjeta enfocada, simula el clic.
+                    articuloHtml.addEventListener('keydown', function(evento) {
+                        if (evento.key === 'Enter' || evento.key === ' ') {
+                            evento.preventDefault();
+                            window.location.href = 'noticia.html?id=' + idNoticia;
+                        }
+                    });
                 })(noticiaActual.id);
 
                 // Insertamos la tarjeta en el contenedor de la cuadrícula.
@@ -223,7 +236,7 @@ function comprobarSesion() {
    -------------------------------------------------------------------------- */
 function actualizarInterfazUsuario(estaLogueado) {
     // Referencia a los dos grupos de controles del footer.
-    var controlesAdministrador = document.getElementById('controles-administradoristrador');    // Botón "Panel Admin"
+    var controlesAdministrador = document.getElementById('controles-administrador');    // Botón "Panel Admin"
     var controlesPublico       = document.getElementById('controles-publico'); // Botón "Admin" (Login)
 
     if (estaLogueado) {

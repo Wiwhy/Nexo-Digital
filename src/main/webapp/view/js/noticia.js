@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    noticia.js — JAVASCRIPT DE LA PÁGINA DE DETALLE DE NOTICIA (noticia.html)
 
    Este archivo controla la página que muestra una noticia completa.
@@ -238,7 +238,7 @@ function comprobarSesion() {
    Muestra u oculta los controles del footer según si hay admin logueado o no.
    -------------------------------------------------------------------------- */
 function actualizarInterfazUsuario(estaLogueado) {
-    var controlesAdministrador = document.getElementById('controles-administradoristrador');    // Botón "Panel Admin"
+    var controlesAdministrador = document.getElementById('controles-administrador');    // Botón "Panel Admin"
     var controlesPublico       = document.getElementById('controles-publico'); // Botón "Admin" (Login)
 
     if (estaLogueado) {

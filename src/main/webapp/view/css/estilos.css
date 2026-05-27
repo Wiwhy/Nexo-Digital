@@ -264,6 +264,15 @@ textarea,
     box-shadow: var(--sombra-hover);
 }
 
+/* Accesibilidad: contorno visible cuando la tarjeta recibe foco por teclado.
+   :focus-visible solo se activa con teclado, no con clic de ratón. */
+.tarjeta-noticia:focus-visible {
+    outline: 0.1875rem solid var(--color-primario);
+    outline-offset: 0.125rem;
+    transform: translateY(-0.25rem);
+    box-shadow: var(--sombra-hover);
+}
+
 /* Imagen de la tarjeta: ocupa todo el ancho, altura fija de 14rem.
    object-fit: cover → recorta la imagen para que rellene el espacio sin deformarse.
    flex-shrink: 0 → impide que la imagen se encoja si la tarjeta es pequeña. */
@@ -577,8 +586,16 @@ textarea,
     }
 }
 
+/* En tablets (hasta 900px aprox.):
+   - El grid pasa de 3 columnas a 2 columnas. */
+@media (max-width: 56.25rem) {
+    .grid-noticias {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 /* En móviles (hasta 768px):
-   - El grid pasa de 3 columnas a 1 columna (las tarjetas van apiladas).
+   - El grid pasa a 1 columna (las tarjetas van apiladas).
    - El artículo de noticia completa reduce su padding. */
 @media (max-width: 48rem) {
     .grid-noticias {

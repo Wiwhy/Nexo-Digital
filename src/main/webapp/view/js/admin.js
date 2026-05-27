@@ -228,9 +228,13 @@ function abrirModalNoticia(objetoNoticia) {
         if (objetoNoticia.nombreImagen && objetoNoticia.nombreImagen !== 'null' && objetoNoticia.nombreImagen !== '') {
             // La noticia tiene imagen → mostramos su nombre de archivo.
             elementoTextoArchivo.textContent = objetoNoticia.nombreImagen;
+            // Marcamos el formulario: ya tiene imagen guardada, no es obligatorio subir otra.
+            formularioHtml.dataset.tieneImagen = 'true';
         } else {
             // La noticia no tiene imagen → mostramos el texto por defecto.
             elementoTextoArchivo.textContent = 'Ningún archivo seleccionado';
+            // Sin imagen previa: el usuario deberá subir una.
+            formularioHtml.dataset.tieneImagen = 'false';
         }
 
         botonGuardarHtml.textContent = 'Guardar';
@@ -251,6 +255,9 @@ function abrirModalNoticia(objetoNoticia) {
         document.getElementById('campo-oculto-id').value                 = '';
         document.getElementById('texto-nombre-archivo').textContent      = 'Ningún archivo seleccionado';
         botonGuardarHtml.textContent = 'Crear';
+
+        // En modo creación no hay imagen previa: siempre es obligatorio subir una.
+        formularioHtml.dataset.tieneImagen = 'false';
 
         // Ocultamos el botón de eliminar (no tiene sentido en modo creación).
         botonEliminarHtml.style.display = 'none';
@@ -278,6 +285,24 @@ function guardarNoticia(eventoSubmit) {
     // FormData empaqueta todos los campos del formulario, incluidos archivos.
     // Automáticamente usa multipart/form-data, que los Servlets con @MultipartConfig esperan.
     var datosDelFormulario = new FormData(eventoSubmit.target);
+
+    // --- VALIDACIÓN DE IMAGEN ---
+    // La imagen es obligatoria siempre que la noticia no tenga ya una imagen guardada.
+    // formulario.dataset.tieneImagen lo establece abrirModalNoticia() al abrir el modal:
+    //   'true'  → modo edición con imagen existente (no es obligatorio subir otra)
+    //   'false' → modo creación O modo edición sin imagen previa (obligatorio subir una)
+    var formulario     = eventoSubmit.target;
+    var tieneImagen    = formulario.dataset.tieneImagen === 'true';
+    var archivoElegido = datosDelFormulario.get('imagen');
+    var hayArchivoNuevo = archivoElegido && archivoElegido.size > 0;
+
+    if (!tieneImagen && !hayArchivoNuevo) {
+        // No hay imagen previa ni se ha seleccionado archivo → bloqueamos el envío.
+        alert('La imagen es obligatoria. Por favor, selecciona un archivo de imagen.');
+        // Resaltamos visualmente el campo de imagen para orientar al usuario.
+        document.getElementById('campo-archivo-imagen').focus();
+        return;
+    }
 
     // Leemos el campo oculto "id":
     //   - Si tiene valor → es una noticia existente → actualizamos.
