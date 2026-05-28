@@ -1,37 +1,5 @@
 <!DOCTYPE html>
-<!--
-    ============================================================
-    CÓMO SE CONECTA ESTE ARCHIVO CON EL RESTO DEL PROYECTO
-    ============================================================
 
-    index.html es la primera página que ve el usuario.
-    No tiene lógica propia: solo define la estructura visual (HTML)
-    y delega TODA la lógica al archivo "app.js" que se carga al final.
-
-    La conexión funciona así:
-      1. El navegador descarga y muestra este HTML.
-      2. Al llegar al final del <body>, carga app.js con <script>.
-      3. app.js espera el evento "DOMContentLoaded" (que se dispara
-         cuando el HTML ya está completamente leído y construido).
-      4. Desde ese momento, app.js puede buscar elementos por su "id"
-         y añadirles comportamiento (onclick, onsubmit, etc.).
-      5. Cuando el usuario interactúa, app.js hace peticiones fetch()
-         a URLs del tipo "../api/...". Esas URLs las gestiona Tomcat,
-         que las redirige al Servlet Java correcto según la anotación
-         @WebServlet que cada Servlet tiene definida.
-
-    RESUMEN DEL FLUJO GENERAL:
-      [HTML: elemento con id] → [app.js: event listener por ese id]
-        → [fetch() a una URL] → [Tomcat: busca el Servlet con @WebServlet]
-          → [Servlet Java: lee, valida, llama al DAO]
-            → [DAO: ejecuta SQL en MySQL]
-              → [MySQL devuelve resultado]
-            → [DAO: devuelve objeto Java]
-          → [Servlet: convierte a JSON, envía respuesta HTTP]
-        → [app.js: .then() recibe el JSON]
-      → [app.js: actualiza el DOM (lo que el usuario ve)]
-    ============================================================
--->
 <html lang="es">
 
 <head>
@@ -42,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Hoja de estilos: solo da el aspecto visual, no tiene lógica. -->
+    
     <link rel="stylesheet" href="css/estilos.css?v=14">
 </head>
 
@@ -56,26 +24,6 @@
         </div>
     </header>
 
-    <!-- ===== CUADRÍCULA DE NOTICIAS =============================
-         Este div empieza VACÍO en el HTML.
-
-         RUTA LÓGICA (automática al cargar la página):
-           1. [index.html] El navegador llega al <script src="js/app.js?v=2">.
-           2. [app.js] DOMContentLoaded dispara cargarNoticias().
-           3. [app.js] cargarNoticias() hace:
-                  fetch GET '../api/noticias/listar'
-           4. [Tomcat] La URL '/api/noticias/listar' coincide con la
-                  anotación @WebServlet("/api/noticias/listar") de:
-                  ListarNoticiasServlet.java → método doGet()
-           5. [ListarNoticiasServlet] Crea ListarNoticiasDAO y llama a listarTodas().
-           6. [ListarNoticiasDAO] Ejecuta en MySQL:
-                  SELECT * FROM noticias ORDER BY fecha_publicacion DESC
-           7. [MySQL] Devuelve todas las filas de la tabla.
-           8. [ListarNoticiasDAO] Construye una List<Noticia> con los resultados.
-           9. [ListarNoticiasServlet] Convierte la lista a texto JSON y lo envía.
-          10. [app.js] El .then() recibe el JSON, crea un <article> por cada
-                  noticia y lo inserta aquí (en #cuadricula-noticias).
-    ============================================================= -->
     <main class="contenedor-principal" id="seccion-feed">
         <div id="cuadricula-noticias" class="grid-noticias"></div>
     </main>
@@ -84,84 +32,17 @@
         <div class="contenedor-footer">
             <a href="legal.html" class="btn-texto-azul">Política de privacidad y aviso legal</a>
 
-            <!-- ===== ZONA DE CONTROLES DE SESIÓN ====================
-                 Estos dos divs son mutuamente excluyentes (solo uno visible).
-
-                 RUTA LÓGICA (automática tras cargar las noticias):
-                   1. [app.js] Tras cargarNoticias(), el .then() llama a comprobarSesion().
-                   2. [app.js] comprobarSesion() hace:
-                          fetch GET '../api/sesion'
-                   3. [Tomcat] La URL '/api/sesion' coincide con:
-                          SesionServlet.java → método doGet()
-                   4. [SesionServlet] Llama a request.getSession(false).
-                          Si hay sesión activa con atributo "adminLogueado" → logueado = true.
-                          Si no → logueado = false.
-                   5. [SesionServlet] Responde con JSON: {"logueado": true/false, "usuario": "..."}
-                   6. [app.js] El .then() recibe el JSON y llama a actualizarUI(data.logueado).
-                   7. [app.js] actualizarUI():
-                          Si logueado=true  → muestra #controles-administrador, oculta #controles-publico.
-                          Si logueado=false → muestra #controles-publico, oculta #controles-administrador.
-            ======================================================= -->
             <div id="controles-publico">
-                <!-- ===== BOTÓN "Admin" (abre el modal de login) ===========
-                     RUTA LÓGICA:
-                       1. [index.html] Este botón tiene id="boton-abrir-login".
-                       2. [app.js] DOMContentLoaded asigna:
-                              document.getElementById('boton-abrir-login').onclick
-                              = function() { abrirModal('ventana-emergente-login'); }
-                       3. [app.js] abrirModal('ventana-emergente-login') cambia el CSS:
-                              document.getElementById('ventana-emergente-login').style.display = 'flex'
-                          → el modal aparece en pantalla.
-                       ⚠️ Este botón NO contacta al servidor. Solo muestra el modal.
-                ========================================================= -->
+                
                 <button id="boton-abrir-login" class="btn-texto-azul">Admin</button>
             </div>
 
-            <!-- Visible solo si hay admin logueado (app.js lo controla). -->
             <div id="controles-administrador" style="display:none;">
                 <a href="admin.html" class="btn-texto-azul">Panel de admin</a>
             </div>
         </div>
     </footer>
 
-    <!-- ===== MODAL DE LOGIN =====================================
-         Empieza OCULTO. Se muestra al pulsar el botón "Admin".
-
-         RUTA LÓGICA al enviar el formulario (botón "Entrar"):
-           1. [index.html] El formulario tiene id="formulario-login".
-           2. [app.js] DOMContentLoaded asigna:
-                  document.getElementById('formulario-login').onsubmit = iniciarSesion
-           3. [app.js] iniciarSesion(e):
-                  e.preventDefault()  → cancela el envío HTML por defecto.
-                  Lee los campos:
-                    usuario = document.getElementById('campo-usuario').value
-                    password = document.getElementById('campo-contrasena').value
-                  Hace:
-                    fetch POST '../api/login'
-                    body: 'usuario=X&password=Y'
-           4. [Tomcat] La URL '/api/login' coincide con:
-                  LoginServlet.java → método doPost()
-           5. [LoginServlet] Lee los parámetros "usuario" y "password".
-                  Crea LoginDAO y llama a autenticar(usuario, password).
-           6. [LoginDAO] Ejecuta en MySQL:
-                  SELECT * FROM administradores WHERE usuario=? AND password_hash=?
-           7. [MySQL] Devuelve la fila si existe, vacío si no.
-           8. [LoginServlet]:
-                  Si encontró el admin → crea sesión HTTP:
-                    session.setAttribute("adminLogueado", true)
-                    Responde HTTP 200 (res.ok = true en JS)
-                  Si no → responde HTTP 401 (res.ok = false en JS)
-           9. [app.js] El .then() comprueba res.ok:
-                  Si true → window.location.href = 'admin.html' (redirige)
-                  Si false → alert('Usuario o contraseña incorrectos')
-
-         ⚠️ BOTÓN CERRAR:
-           1. [index.html] Botón con id="boton-cerrar-login".
-           2. [app.js] DOMContentLoaded asigna:
-                  document.getElementById('boton-cerrar-login').onclick
-                  = function() { cerrarModal('ventana-emergente-login'); }
-           3. [app.js] cerrarModal(): style.display = 'none' → desaparece.
-    ============================================================= -->
     <div id="ventana-emergente-login" class="modal" style="display:none;">
         <div class="modal-contenido">
             <button class="cerrar" id="boton-cerrar-login">&times;</button>
@@ -180,13 +61,6 @@
         </div>
     </div>
 
-    <!-- ===== JAVASCRIPT ==========================================
-         Este <script> le dice al navegador que descargue y ejecute app.js.
-         Está al FINAL del body para que cuando se ejecute, todos los
-         elementos HTML de arriba ya existan en el DOM.
-         Si estuviera en el <head>, document.getElementById(...) no
-         encontraría nada porque el HTML aún no se habría leído.
-    ============================================================= -->
     <script src="js/app.js?v=2"></script>
 </body>
 

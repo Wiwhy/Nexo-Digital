@@ -1,67 +1,30 @@
-/* ============================================================
-   estilos.css — HOJA DE ESTILOS PRINCIPAL
-   Compartida por todas las páginas del proyecto.
-   Contiene: variables globales, reset, tipografía, layout,
-   tarjetas de noticias, botones, modales y media queries.
-   ============================================================ */
 
 
-/* ============================================================
-   VARIABLES GLOBALES (Custom Properties de CSS)
-
-   ":root" es el elemento raíz del documento (equivale a <html>).
-   Definir variables aquí las hace accesibles en cualquier selector
-   con "var(--nombre-variable)". Si cambiamos el color primario
-   aquí, cambia en toda la web automáticamente.
-   ============================================================ */
 :root {
-    /* Color azul principal: botones, logo, enlaces */
+    
     --color-primario: #295DB6;
 
-    /* Color azul más oscuro: estado hover de botones y enlaces */
     --color-hover: #204b96;
 
-    /* Gris claro para el fondo de la página */
     --bg-fondo: #EAEAEA;
 
-    /* Blanco puro para tarjetas, modales y cabecera/footer */
     --bg-blanco: #FFFFFF;
 
-    /* Negro para textos principales */
     --texto-principal: #000000;
 
-    /* Gris oscuro para textos secundarios (autor, fecha, cuerpo de noticia) */
     --texto-gris-oscuro: #333333;
 
-    /* Gris medio para líneas divisorias y bordes desactivados */
     --lineas-disabled: #C2C2C2;
 
-    /* Radio de borde para las tarjetas de noticias */
     --radio-tarjetas: 1rem;
 
-    /* Radio de borde para botones e inputs */
     --radio-botones: 0.5rem;
 
-    /* Sombra suave para tarjetas en estado normal */
     --sombra-fija: 0 0.25rem 0.6rem rgba(0, 0, 0, 0.05);
 
-    /* Sombra más pronunciada para el estado hover de las tarjetas */
     --sombra-hover: 0 0.75rem 1.25rem rgba(0, 0, 0, 0.08);
 }
 
-
-/* ============================================================
-   RESET UNIVERSAL
-
-   "*" selecciona TODOS los elementos.
-   "::before" y "::after" seleccionan el pseudo-contenido.
-   "box-sizing: border-box" → el padding y el borde se incluyen
-     en el tamaño total del elemento (no lo suman por fuera).
-     Esto evita que un <div> de width:100% se salga de su contenedor
-     al añadirle padding.
-   "margin: 0; padding: 0" → elimina los márgenes y rellenos
-     que los navegadores añaden por defecto a muchos elementos.
-   ============================================================ */
 *,
 *::before,
 *::after {
@@ -70,23 +33,11 @@
     padding: 0;
 }
 
-
-/* ============================================================
-   ESTILOS BASE DE HTML Y BODY
-   ============================================================ */
-
-/* font-size: 100% en html → 1rem = 16px (el tamaño por defecto del navegador).
-   Usar % en lugar de px permite que usuarios con texto grande en sistema
-   lo respeten (accesibilidad).
-   scroll-behavior: smooth → los saltos a anclas (#) se animan suavemente. */
 html {
     font-size: 100%;
     scroll-behavior: smooth;
 }
 
-/* flex-direction: column → el header, main y footer se apilan verticalmente.
-   min-height: 100vh → el body ocupa al menos el 100% de la altura de la pantalla.
-   Esto mantiene el footer pegado abajo aunque el contenido sea corto. */
 body {
     font-family: 'Inter', sans-serif;
     background: var(--bg-fondo);
@@ -96,25 +47,16 @@ body {
     min-height: 100vh;
 }
 
-
-/* ============================================================
-   TIPOGRAFÍA — JERARQUÍA DE ENCABEZADOS Y TEXTOS
-   ============================================================ */
-
-/* h1: título más grande, para el logo y encabezados de página. */
 h1 {
     font-size: 2.4rem;
     font-weight: 700;
 }
 
-/* h2: subtítulos de sección. */
 h2 {
     font-size: 1.5rem;
     font-weight: 700;
 }
 
-/* h3, label, input, textarea y .titulo-lista-admin comparten el mismo
-   tamaño de fuente base (1rem = 16px) y peso semibold (600). */
 h3,
 label,
 input,
@@ -124,15 +66,6 @@ textarea,
     font-weight: 600;
 }
 
-
-/* ============================================================
-   CABECERA Y PIE DE PÁGINA
-
-   Ambos comparten los mismos estilos porque tienen el mismo
-   aspecto visual: fondo blanco, altura fija y sombra.
-   z-index: 10 asegura que la cabecera quede por encima de
-   cualquier contenido que se pueda solapar al hacer scroll.
-   ============================================================ */
 .cabecera-principal,
 .pie-pagina {
     background: var(--bg-blanco);
@@ -141,22 +74,18 @@ textarea,
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;   /* Necesario para que z-index y la sombra funcionen correctamente */
+    position: relative;   
     z-index: 10;
 }
 
-/* Sombra del header: proyectada hacia abajo, negro al 15% de opacidad */
 .cabecera-principal {
     box-shadow: 0 0.25rem 0.6rem rgba(0, 0, 0, 0.15);
 }
 
-/* Sombra del footer: proyectada hacia arriba, negro al 15% de opacidad */
 .pie-pagina {
     box-shadow: 0 -0.25rem 0.6rem rgba(0, 0, 0, 0.15);
 }
 
-/* Contenedor interno del header: limita el ancho al 65% de la pantalla
-   y centra el contenido horizontalmente. */
 .contenedor-header {
     width: 65%;
     margin: 0 auto;
@@ -165,8 +94,6 @@ textarea,
     justify-content: flex-start;
 }
 
-/* Contenedor interno del footer: divide el espacio en 2 columnas iguales
-   (link legal a la izquierda, controles de sesión a la derecha). */
 .contenedor-footer {
     width: 65%;
     margin: 0 auto;
@@ -176,38 +103,25 @@ textarea,
     gap: 1rem;
 }
 
-/* El primer hijo directo del footer (el link legal) se alinea a la izquierda. */
 .contenedor-footer>a:first-child {
     text-align: left;
 }
 
-/* El resto de elementos del footer se alinean a la derecha. */
 .contenedor-footer> :not(a:first-child) {
     justify-self: end;
     text-align: right;
 }
 
-/* Quita el subrayado del enlace del logo. */
 .logo-link {
     text-decoration: none;
 }
 
-/* Tamaño y color del logo (más pequeño que el h1 estándar). */
 .logo-link h1 {
     font-size: 1.8rem;
     color: var(--color-primario);
     margin: 0;
 }
 
-
-/* ============================================================
-   CONTENEDOR PRINCIPAL
-
-   Limita el ancho del contenido principal al 65% de la pantalla
-   y lo centra. El "flex: 1" hace que este elemento crezca para
-   ocupar todo el espacio disponible entre header y footer,
-   evitando que el footer suba cuando hay poco contenido.
-   ============================================================ */
 .contenedor-principal {
     width: 65%;
     margin: 0 auto !important;
@@ -215,20 +129,6 @@ textarea,
     flex: 1;
 }
 
-
-/* ============================================================
-   GRID DE NOTICIAS (cuadrícula de tarjetas en index.html)
-   ============================================================ */
-
-/*
- * display: grid → activa el sistema de cuadrícula CSS.
- * grid-template-columns: repeat(3, 1fr) → 3 columnas de igual ancho.
- *   "1fr" = 1 fracción del espacio disponible (se reparte equitativamente).
- * gap: 2.5rem → espacio entre las tarjetas.
- * align-items: start → las tarjetas NO se estiran para igualar la altura
- *   de la fila; cada una tiene la altura de su propio contenido.
- *   Esto evita que tarjetas con títulos cortos queden con espacio vacío.
- */
 .grid-noticias {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -238,14 +138,6 @@ textarea,
     align-items: start;
 }
 
-/*
- * Cada tarjeta de noticia.
- * display: inline-flex → la tarjeta se dimensiona según su contenido
- *   en altura (no rellena la celda del grid).
- * width: 100% → ocupa todo el ancho de su columna.
- * overflow: hidden → recorta la imagen si sobresale del borde redondeado.
- * transition: → anima el movimiento y la sombra al hacer hover.
- */
 .tarjeta-noticia {
     display: inline-flex;
     flex-direction: column;
@@ -258,14 +150,11 @@ textarea,
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
-/* Al pasar el ratón por encima, la tarjeta sube ligeramente y gana sombra. */
 .tarjeta-noticia:hover {
     transform: translateY(-0.25rem);
     box-shadow: var(--sombra-hover);
 }
 
-/* Accesibilidad: contorno visible cuando la tarjeta recibe foco por teclado.
-   :focus-visible solo se activa con teclado, no con clic de ratón. */
 .tarjeta-noticia:focus-visible {
     outline: 0.1875rem solid var(--color-primario);
     outline-offset: 0.125rem;
@@ -273,9 +162,6 @@ textarea,
     box-shadow: var(--sombra-hover);
 }
 
-/* Imagen de la tarjeta: ocupa todo el ancho, altura fija de 14rem.
-   object-fit: cover → recorta la imagen para que rellene el espacio sin deformarse.
-   flex-shrink: 0 → impide que la imagen se encoja si la tarjeta es pequeña. */
 .tarjeta-noticia img {
     width: 100%;
     height: 14rem;
@@ -285,8 +171,6 @@ textarea,
     flex-shrink: 0;
 }
 
-/* Zona de texto blanca debajo de la imagen.
-   Sin flex-grow: la caja solo mide lo que necesita el título (no se estira). */
 .contenido-tarjeta {
     display: flex;
     flex-direction: column;
@@ -295,9 +179,6 @@ textarea,
     box-sizing: border-box;
 }
 
-/* Título dentro de la tarjeta:
-   word-wrap / overflow-wrap / white-space: normal → el texto puede romper líneas
-   si el título es muy largo, evitando que se salga de la tarjeta. */
 .contenido-tarjeta h3 {
     font-size: 1.25rem;
     line-height: 1.4;
@@ -307,12 +188,6 @@ textarea,
     white-space: normal;
 }
 
-
-/* ============================================================
-   PÁGINA DE DETALLE DE NOTICIA (noticia.html)
-   ============================================================ */
-
-/* Tarjeta blanca que envuelve el artículo completo. */
 .noticia-completa {
     background: var(--bg-blanco);
     width: 100%;
@@ -322,15 +197,12 @@ textarea,
     box-shadow: var(--sombra-fija);
 }
 
-/* Título principal de la noticia (más grande que el h2 estándar). */
 .noticia-completa h2 {
     font-size: 2.4rem;
     line-height: 1.2;
     margin-bottom: 1rem;
 }
 
-/* Zona de metadatos: autor y fecha, en gris y tamaño reducido.
-   display: flex + gap → muestra autor y fecha en fila con separación. */
 .meta-noticia {
     font-size: 0.9rem;
     color: var(--texto-gris-oscuro);
@@ -339,8 +211,6 @@ textarea,
     gap: 1.5rem;
 }
 
-/* Imagen grande (hero) de la noticia.
-   max-height: 35rem → límite de altura para no ocupar toda la pantalla. */
 .imagen-hero {
     width: 100%;
     border-radius: var(--radio-tarjetas);
@@ -349,7 +219,6 @@ textarea,
     max-height: 35rem;
 }
 
-/* Párrafos del cuerpo de la noticia: tamaño y espaciado cómodo para lectura. */
 .cuerpo-texto p {
     font-size: 1.125rem;
     font-weight: 400;
@@ -358,14 +227,6 @@ textarea,
     color: var(--texto-gris-oscuro);
 }
 
-
-/* ============================================================
-   BOTONES
-
-   .btn-azul y .btn-primario son sinónimos (mismo estilo).
-   Se aplican propiedades con !important para que no sean
-   sobreescritas por estilos del navegador en elementos como <a>.
-   ============================================================ */
 .btn-azul,
 .btn-primario {
     background-color: var(--color-primario) !important;
@@ -373,7 +234,7 @@ textarea,
     border: none !important;
     border-radius: var(--radio-botones) !important;
     cursor: pointer;
-    font-family: inherit;       /* Hereda la fuente Inter del body */
+    font-family: inherit;       
     font-size: 1rem;
     font-weight: 600;
     transition: background-color 0.2s;
@@ -381,40 +242,34 @@ textarea,
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    text-decoration: none;      /* Para cuando se usa en etiquetas <a> */
+    text-decoration: none;      
     margin: 0;
 }
 
-/* Estado hover: azul más oscuro */
 .btn-azul:hover,
 .btn-primario:hover {
     background-color: var(--color-hover) !important;
 }
 
-/* Botón pequeño: para listas y acciones secundarias (ej. "Editar"). */
 .boton-pequeno {
     padding: 0 !important;
     height: 2.5rem !important;
     width: 6.5rem !important;
-    flex-shrink: 0 !important;  /* No se encoge aunque el contenedor sea pequeño */
+    flex-shrink: 0 !important;  
 }
 
-/* Botón grande: para acciones principales (ej. "Entrar", "Guardar"). */
 .boton-grande {
     padding: 0 !important;
     height: 2.8rem !important;
     width: 7.5rem !important;
-    margin: 0 auto !important;  /* Se centra horizontalmente */
+    margin: 0 auto !important;  
 }
 
-/* Variante de botón grande que ocupa el ancho completo (en formularios). */
 .boton-boton-ancho-total {
     width: 7.5rem !important;
     margin-top: 1rem !important;
 }
 
-/* Botón de texto (sin fondo): para links del footer y otros secundarios.
-   También se aplica a los enlaces del footer directamente. */
 .btn-texto-azul,
 .contenedor-footer a {
     background: transparent;
@@ -427,60 +282,44 @@ textarea,
     margin: 0;
 }
 
-/* Estado hover de botones de texto. */
 .btn-texto-azul:hover,
 .contenedor-footer a:hover {
     color: var(--color-hover) !important;
 }
 
-
-/* ============================================================
-   MODALES (ventanas emergentes)
-   ============================================================ */
-
-/* El overlay oscuro que cubre toda la pantalla cuando el modal está abierto.
-   position: fixed + inset: 0 → ocupa exactamente toda la ventana del navegador.
-   z-index: 2000 → se dibuja por encima de cualquier otro elemento. */
 .modal {
     position: fixed;
-    inset: 0;                           /* Equivale a top:0; right:0; bottom:0; left:0 */
-    background: rgba(0, 0, 0, 0.5);    /* Fondo negro semitransparente (50% opacidad) */
+    inset: 0;                           
+    background: rgba(0, 0, 0, 0.5);    
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 2000;
 }
 
-/* El cuadro blanco interior del modal.
-   max-width: 38rem → nunca será más ancho que ~608px.
-   max-height: 90vh + overflow-y: auto → si el contenido es muy largo,
-     aparece una barra de scroll dentro del modal (no en la página). */
 .modal-contenido {
     background: var(--bg-blanco);
     padding: 2.5rem;
     border-radius: var(--radio-tarjetas) !important;
     width: 90%;
     max-width: 38rem;
-    position: relative;     /* Necesario para posicionar el botón "×" con position:absolute */
+    position: relative;     
     border: none !important;
     box-shadow: var(--sombra-hover);
     max-height: 90vh;
     overflow-y: auto;
 }
 
-/* El botón de envío dentro del modal hereda el display flex del padre. */
 .modal-contenido form>.btn-azul {
     display: flex;
 }
 
-/* Título del modal: centrado y con separación inferior. */
 .modal-contenido h2 {
     text-align: center;
     margin-top: 0;
     margin-bottom: 2rem;
 }
 
-/* Botón "×" para cerrar el modal: posicionado en la esquina superior derecha. */
 .cerrar {
     position: absolute;
     top: 1.5rem;
@@ -493,14 +332,6 @@ textarea,
     background: none;
 }
 
-
-/* ============================================================
-   GRUPOS DE INPUTS (contenedor de label + campo)
-
-   Cada campo del formulario está envuelto en un .grupo-input
-   para agrupar visualmente la etiqueta con el input.
-   flex-direction: column → la etiqueta queda arriba del campo.
-   ============================================================ */
 .grupo-input {
     margin-bottom: 1.5rem;
     display: flex;
@@ -508,10 +339,6 @@ textarea,
     gap: 0.5rem;
 }
 
-/* Estilos de los inputs de texto y textareas dentro de los formularios.
-   border: transparent → invisible por defecto, visible al enfocar.
-   outline: none → quita el borde azul por defecto del navegador.
-   transition → el borde de color aparece suavemente. */
 .grupo-input input:not([type="file"]),
 .grupo-input textarea {
     padding: 1rem;
@@ -525,13 +352,11 @@ textarea,
     margin: 0;
 }
 
-/* Al enfocar un input o textarea, aparece el borde azul. */
 .grupo-input input:focus,
 .grupo-input textarea:focus {
     border-color: var(--color-primario);
 }
 
-/* Input de tipo archivo: estilos especiales para que encaje con el diseño. */
 .grupo-input input[type="file"] {
     background-color: var(--bg-fondo) !important;
     padding: 1rem;
@@ -543,8 +368,6 @@ textarea,
     margin: 0;
 }
 
-/* Botón nativo del selector de archivos (el "Examinar..." o "Choose file").
-   Se personaliza para que tenga el mismo aspecto que el resto del diseño. */
 .grupo-input input[type="file"]::file-selector-button {
     background-color: var(--bg-blanco);
     border: 0.0625rem solid var(--lineas-disabled);
@@ -558,25 +381,10 @@ textarea,
     transition: background-color 0.2s;
 }
 
-/* Hover del botón nativo del selector de archivos. */
 .grupo-input input[type="file"]::file-selector-button:hover {
     background-color: #f3f4f6;
 }
 
-
-/* ============================================================
-   DISEÑO ADAPTABLE — MEDIA QUERIES
-
-   Las media queries aplican estilos SOLO cuando el ancho de la
-   pantalla cumple la condición. Se usan unidades "rem" en vez
-   de "px" para respetar la configuración de texto del usuario.
-
-   max-width: 75rem → 1200px aprox (tablet apaisada/escritorio pequeño)
-   max-width: 48rem → 768px aprox (móvil y tablet vertical)
-   ============================================================ */
-
-/* En pantallas de hasta 1200px: el contenido ocupa el 90% del ancho
-   en lugar del 65%, para aprovechar mejor el espacio. */
 @media (max-width: 75rem) {
 
     .contenedor-principal,
@@ -586,16 +394,12 @@ textarea,
     }
 }
 
-/* En tablets en formato horizontal (hasta 1024px aprox.):
-   - El grid pasa de 3 columnas a 2 columnas. */
 @media (max-width: 64rem) {
     .grid-noticias {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
-/* En móviles y tablets en formato vertical (hasta 768px):
-   - El artículo de noticia completa reduce su padding. */
 @media (max-width: 48rem) {
     .noticia-completa {
         padding: 2rem;
@@ -606,30 +410,19 @@ textarea,
     }
 }
 
-/* En móviles (hasta 600px aprox.):
-   - El grid pasa a 1 columna (las tarjetas van apiladas). */
 @media (max-width: 37.5rem) {
     .grid-noticias {
         grid-template-columns: 1fr;
     }
 }
 
-
-/* ============================================================
-   CORRECCIÓN DEL AUTOCOMPLETADO DEL NAVEGADOR (WEBKIT)
-
-   Cuando el navegador rellena un input automáticamente (por ejemplo
-   el usuario guardado), Chrome aplica un fondo amarillo.
-   Estos estilos lo sobreescriben para mantener el fondo gris claro
-   y el color de texto negro del diseño.
-   ============================================================ */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-    /* Técnica: shadow inset tan grande que tapa el fondo amarillo. */
+    
     -webkit-box-shadow: 0 0 0 2rem var(--bg-fondo) inset !important;
     -webkit-text-fill-color: var(--texto-principal) !important;
-    /* Retrasa el cambio de fondo 5000 segundos para que nunca se vea el color original. */
+    
     transition: background-color 5000s ease-in-out 0s;
 }

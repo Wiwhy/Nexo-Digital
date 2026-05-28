@@ -1,35 +1,5 @@
 <!DOCTYPE html>
-<!--
-    ============================================================
-    CÓMO SE CONECTA ESTE ARCHIVO CON EL RESTO DEL PROYECTO
-    ============================================================
 
-    admin.html es la página del panel de administración.
-    Solo los administradores autenticados pueden usarla.
-
-    IMPORTANTE — PROTECCIÓN DE LA PÁGINA:
-    No basta con que esté "oculta". admin.js, al cargar esta página,
-    SIEMPRE pregunta al servidor si hay sesión activa. Si no la hay,
-    redirige automáticamente a index.html. Esto es lo que realmente
-    protege la página (no que el enlace sea difícil de encontrar).
-
-    CONEXIÓN HTML → JS → SERVIDOR:
-      El <script src="js/admin.js?v=2"> al final del body es el "pegamento"
-      que une este HTML con la lógica Java del backend.
-      admin.js usa los "id" de los elementos HTML para identificarlos
-      y añadirles comportamiento. Sin ese id, el JS no puede encontrarlos.
-
-    FLUJO GENERAL AL ABRIR ESTA PÁGINA:
-      1. El navegador descarga y muestra este HTML.
-      2. Al llegar al <script>, carga admin.js.
-      3. admin.js espera DOMContentLoaded y luego:
-         a) Llama a comprobarSesionAdmin() → si no hay sesión, redirige.
-         b) Si hay sesión, llama a cargarNoticiasAdmin()
-            → fetch GET /api/noticias/listar
-            → ListarNoticiasServlet → ListarNoticiasDAO → SQL SELECT
-            → rellena #lista-noticias con filas dinámicas.
-    ============================================================
--->
 <html lang="es">
 
 <head>
@@ -37,9 +7,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de administración - Nexo Digital</title>
     <link rel="icon" href="img/favicon.png?v=2" type="image/png">
-    <!-- Estilos base compartidos con todas las páginas. -->
+    
     <link rel="stylesheet" href="css/estilos.css?v=14">
-    <!-- Estilos adicionales exclusivos del panel de admin. -->
+    
     <link rel="stylesheet" href="css/admin.css?v=14">
 </head>
 
@@ -59,59 +29,9 @@
             <div class="encabezado-admin">
                 <h2>Gestión de noticias</h2>
 
-                <!-- ===== BOTÓN "Crear" ================================
-                     RUTA LÓGICA:
-                       1. [admin.html] Botón con id="boton-nueva-noticia".
-                       2. [admin.js] DOMContentLoaded asigna:
-                              document.getElementById('boton-nueva-noticia').onclick
-                              = function() { abrirModalNoticia(); }
-                              (sin argumento → modo CREACIÓN)
-                       3. [admin.js] abrirModalNoticia(null):
-                              - Limpia el formulario: form.reset()
-                              - Pone el título del modal: "Crear noticia"
-                              - Vacía el campo oculto id: noticia-id.value = ''
-                              - Oculta el botón "Eliminar" (no aplica al crear)
-                              - Llama a abrirModal('ventana-emergente-noticia')
-                                → style.display = 'flex' → el modal aparece.
-                       4. El usuario rellena el formulario y pulsa "Crear".
-                          → Ver el comentario del <form id="formulario-noticia"> abajo.
-                       ⚠️ Este botón NO contacta al servidor. Solo muestra el modal.
-                ========================================================= -->
                 <button class="btn-azul boton-grande" id="boton-nueva-noticia">Crear</button>
             </div>
 
-            <!-- ===== LISTA DE NOTICIAS ============================
-                 Este div empieza VACÍO en el HTML.
-
-                 RUTA LÓGICA (automática al cargar la página):
-                   1. [admin.js] comprobarSesionAdmin() verifica sesión.
-                   2. Si hay sesión → llama a cargarNoticiasAdmin().
-                   3. [admin.js] cargarNoticiasAdmin() hace:
-                          fetch GET '../api/noticias/listar'
-                   4. [Tomcat] Redirige a:
-                          ListarNoticiasServlet.java → doGet()
-                   5. [ListarNoticiasServlet] → ListarNoticiasDAO.listarTodas()
-                   6. [ListarNoticiasDAO] Ejecuta en MySQL:
-                          SELECT * FROM noticias ORDER BY fecha_publicacion DESC
-                   7. Devuelve la lista como JSON al JS.
-                   8. [admin.js] renderTablaNoticias() crea dinámicamente
-                          un <div class="fila-noticia"> por cada noticia:
-                          [TÍTULO de la noticia]    [Botón Editar]
-                          y los inserta aquí, en #lista-noticias.
-
-                 RUTA LÓGICA al pulsar "Editar" en una fila:
-                   1. [admin.js] El onclick del botón "Editar" llama a:
-                          abrirModalNoticia(noticiaObj)
-                          donde noticiaObj es el objeto completo de esa noticia
-                          (ya lo tenemos en memoria en noticiasGlobales[], sin ir al servidor).
-                   2. [admin.js] abrirModalNoticia(noticia):
-                          - Rellena el campo oculto id con noticia.id
-                          - Rellena título, autor, contenido con los datos de la noticia
-                          - Muestra el botón "Eliminar"
-                          - Asigna eliminarNoticia(noticia.id) al onclick del botón Eliminar
-                          - Abre el modal.
-                   ⚠️ Pulsar "Editar" NO contacta al servidor (ya tenemos los datos).
-            ============================================================= -->
             <div id="lista-noticias" class="lista-admin">
             </div>
 
@@ -122,114 +42,18 @@
         <div class="contenedor-footer">
             <a href="legal.html" class="btn-texto-azul">Política de Privacidad y Aviso Legal</a>
 
-            <!-- ===== BOTÓN "Cerrar Sesión" ===========================
-                 RUTA LÓGICA:
-                   1. [admin.html] Enlace con id="boton-cerrar-sesion".
-                   2. [admin.js] DOMContentLoaded asigna:
-                          document.getElementById('boton-cerrar-sesion').onclick = cerrarSesion
-                   3. [admin.js] cerrarSesion(e):
-                          e.preventDefault() → cancela la navegación del enlace.
-                          Hace:
-                            fetch POST '../api/sesion'
-                            body: 'action=logout'
-                   4. [Tomcat] La URL '/api/sesion' con método POST coincide con:
-                          SesionServlet.java → doPost()
-                   5. [SesionServlet] Lee el parámetro "action".
-                          Como es "logout", llama a session.invalidate().
-                          Esto DESTRUYE la sesión en el servidor (el admin queda deslogueado).
-                          Responde: {"status":"success", "message":"Sesión cerrada"}
-                   6. [admin.js] El .then() recibe la respuesta y hace:
-                          window.location.href = 'index.html' → redirige al portal.
-            ========================================================= -->
             <a href="#" id="boton-cerrar-sesion" class="btn-texto-azul">Cerrar Sesión</a>
         </div>
     </footer>
 
-    <!-- ===== MODAL DE CREACIÓN / EDICIÓN DE NOTICIAS =============
-         RUTA LÓGICA al enviar el formulario (botón "Guardar" / "Crear"):
-
-         El campo oculto <input id="campo-oculto-id"> decide qué operación hacer:
-           - Si está VACÍO → modo CREACIÓN → POST a /api/noticias → INSERT en MySQL
-           - Si tiene un ID → modo EDICIÓN  → POST a /api/noticias/actualizar → UPDATE en MySQL
-
-         FLUJO MODO CREACIÓN (campo id vacío):
-           1. [admin.html] Formulario id="formulario-noticia".
-           2. [admin.js] DOMContentLoaded asigna:
-                  document.getElementById('formulario-noticia').onsubmit = guardarNoticia
-           3. [admin.js] guardarNoticia(e):
-                  e.preventDefault()
-                  formData = new FormData(e.target)
-                    → empaqueta todos los campos, incluida la imagen (multipart)
-                  id = formData.get('id')  → está vacío
-                  endpoint = '../api/noticias'
-                  fetch POST endpoint, body: formData
-           4. [Tomcat] La URL '/api/noticias' con POST coincide con:
-                  CrearNoticiaServlet.java → doPost()
-                  (tiene @MultipartConfig para poder recibir archivos)
-           5. [CrearNoticiaServlet]:
-                  Verifica sesión → si no hay admin, responde 401 y para.
-                  Lee campos con leerParte(request, "titulo"), etc.
-                  Si hay imagen → genera nombre UUID + guarda en disco.
-                  Crea un objeto Noticia con los datos.
-                  Llama a CrearNoticiaDAO.crear(noticia).
-           6. [CrearNoticiaDAO] Ejecuta en MySQL:
-                  INSERT INTO noticias (titulo, contenido_noticia, nombre_archivo_imagen, autor)
-                  VALUES (?, ?, ?, ?)
-           7. [MySQL] Inserta la fila y devuelve éxito.
-           8. [CrearNoticiaServlet] Responde: {"status":"success", ...}
-           9. [admin.js] El .then() recibe res.ok=true:
-                  cerrarModal('ventana-emergente-noticia') → oculta el modal.
-                  cargarNoticiasAdmin() → recarga la lista con la nueva noticia.
-
-         FLUJO MODO EDICIÓN (campo id tiene valor, ej: "5"):
-           Pasos 1-3 iguales, pero:
-                  id = formData.get('id')  → tiene valor "5"
-                  endpoint = '../api/noticias/actualizar'
-                  fetch POST '../api/noticias/actualizar'
-           4. [Tomcat] → ActualizarNoticiaServlet.java → doPost()
-           5. [ActualizarNoticiaServlet]:
-                  Igual que Crear, pero también lee el "id".
-                  Llama a ActualizarNoticiaDAO.actualizar(noticia).
-           6. [ActualizarNoticiaDAO] Ejecuta en MySQL:
-                  UPDATE noticias SET titulo=?, contenido_noticia=?,
-                  nombre_archivo_imagen=?, autor=? WHERE id=5
-           7. Respuesta y refresco igual que en Creación.
-
-         RUTA LÓGICA al pulsar "Eliminar":
-           1. [admin.js] El onclick de #boton-eliminar-noticia llama a:
-                  eliminarNoticia(noticiaId)
-           2. [admin.js] eliminarNoticia(id):
-                  confirm('¿Seguro?') → si el usuario cancela, se detiene aquí.
-                  fetch POST '../api/noticias/eliminar'
-                  body: 'id=5'  (formato simple, sin FormData porque no hay imagen)
-           3. [Tomcat] → EliminarNoticiaServlet.java → doPost()
-           4. [EliminarNoticiaServlet]:
-                  Verifica sesión.
-                  Lee id con request.getParameter("id") (sin leerParte, no es multipart).
-                  Llama a EliminarNoticiaDAO.eliminar(id).
-           5. [EliminarNoticiaDAO] Ejecuta en MySQL:
-                  DELETE FROM noticias WHERE id=5
-           6. Responde éxito. admin.js cierra modal y recarga lista.
-
-         BOTÓN CERRAR DEL MODAL:
-           1. [admin.html] Botón con id="boton-cerrar-modal-noticia".
-           2. [admin.js] DOMContentLoaded asigna:
-                  document.getElementById('boton-cerrar-modal-noticia').onclick
-                  = function() { cerrarModal('ventana-emergente-noticia'); }
-           3. cerrarModal(): style.display = 'none' → modal desaparece.
-    ============================================================= -->
     <div id="ventana-emergente-noticia" class="modal" style="display:none;">
         <div class="modal-contenido">
             <button class="cerrar" id="boton-cerrar-modal-noticia">&times;</button>
 
-            <!-- admin.js cambia este texto entre "Crear noticia" y "Editar noticia". -->
             <h2 id="titulo-ventana-emergente">Editar noticia</h2>
 
             <form id="formulario-noticia" enctype="multipart/form-data">
 
-                <!-- Campo oculto: el usuario no lo ve, pero el JS lo lee.
-                     Vacío = modo CREACIÓN.
-                     Con valor = modo EDICIÓN (admin.js lo rellena al abrir el modal de edición). -->
                 <input type="hidden" name="id" id="campo-oculto-id">
 
                 <div class="grupo-input">
@@ -247,8 +71,6 @@
                     <textarea id="campo-contenido" name="contenido" required></textarea>
                 </div>
 
-                <!-- El selector de imagen usa un input invisible encima de un botón visual.
-                     admin.js actualiza el <span> con el nombre del archivo elegido. -->
                 <div class="grupo-input">
                     <label for="campo-archivo-imagen">Imagen:</label>
                     <div class="file-input-wrapper">
@@ -259,25 +81,15 @@
                 </div>
 
                 <div class="acciones-modal-flex">
-                    <!-- Botón submit: dispara el evento "submit" del formulario.
-                         admin.js lo captura con onsubmit = guardarNoticia. -->
+                    
                     <button type="submit" class="btn-azul boton-grande" id="boton-guardar-noticia">Guardar</button>
 
-                    <!-- Solo visible en modo edición.
-                         admin.js lo oculta (display:none) en modo creación. -->
                     <button type="button" class="btn-azul boton-grande" id="boton-eliminar-noticia">Eliminar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- ===== JAVASCRIPT ==========================================
-         admin.js se carga aquí, AL FINAL del body.
-         Razón: si estuviera en el <head>, el script se ejecutaría
-         antes de que el HTML estuviera construido, y llamadas como
-         document.getElementById('boton-nueva-noticia') devolverían null
-         porque ese elemento aún no existiría en el DOM.
-    ============================================================= -->
     <script src="js/admin.js?v=2"></script>
 </body>
 
